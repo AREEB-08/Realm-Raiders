@@ -33,6 +33,11 @@ const account = privateKeyToAccount(key);
 
 const pub = createPublicClient({ transport: http(rpc) });
 const chainId = await pub.getChainId();
+// Testnet-only guard: never deploy to Monad mainnet (143) or any other chain by accident.
+if (![10143, 31337].includes(chainId)) {
+  console.error(`Refusing to deploy: RPC ${rpc} is chain ${chainId}; only Monad testnet (10143) or a local anvil (31337) are allowed.`);
+  process.exit(1);
+}
 const depFile = join(root, 'deployments', `${chainId}.json`);
 const dep = existsSync(depFile) ? JSON.parse(readFileSync(depFile, 'utf8')) : { chainId };
 if (dep.RealmDuels) {

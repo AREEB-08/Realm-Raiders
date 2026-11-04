@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * Deploy RealmLedger, ClanSiege and RealmBadges to Monad testnet with viem (same result as
- * script/Deploy.s.sol, no Foundry needed). Uses the solc-js artifacts (run `pnpm build` first).
+ * Deploy RealmLedger, ClanSiege, RealmBadges and RealmDuels to Monad testnet with viem (same
+ * contracts as script/Deploy.s.sol plus RealmDuels, no Foundry needed). Uses the solc-js artifacts
+ * (run `pnpm build` first). Refuses any chain other than Monad testnet (10143) or a local anvil (31337).
  *   DEPLOYER_PRIVATE_KEY=0x… RELAYER_ADDRESS=0x… node scripts/deploy.mjs
  * Defaults: the key/address from apps/server/.env and contracts/.env. Writes deployments/<chainId>.json
  * and refreshes packages/shared/src/deployments.json. Monad charges the gas LIMIT, so gas is
@@ -36,6 +37,12 @@ const badgeUri = process.env.BADGE_URI || contractsEnv.BADGE_URI || 'https://rea
 
 const pub = createPublicClient({ transport: http(rpc) });
 const chainId = await pub.getChainId();
+// Testnet-only guard: never deploy to Monad mainnet (143) or any other chain by accident.
+const ALLOWED_CHAINS = new Set([10143, 31337]);
+if (!ALLOWED_CHAINS.has(chainId)) {
+  console.error(`Refusing to deploy: RPC ${rpc} is chain ${chainId}; only Monad testnet (10143) or a local anvil (31337) are allowed.`);
+  process.exit(1);
+}
 const chain = defineChain({ id: chainId, name: `chain-${chainId}`, nativeCurrency: { name: 'MON', symbol: 'MON', decimals: 18 }, rpcUrls: { default: { http: [rpc] } } });
 const wallet = createWalletClient({ account, chain, transport: http(rpc) });
 const balance = await pub.getBalance({ address: account.address });
@@ -61,8 +68,9 @@ async function deploy(name, args) {
 const ledger = await deploy('RealmLedger', [account.address, relayer]);
 const siege = await deploy('ClanSiege', [account.address, relayer]);
 const badges = await deploy('RealmBadges', [account.address, relayer, badgeUri]);
+const duels = await deploy('RealmDuels', [account.address, relayer]);
 mkdirSync(join(root, 'deployments'), { recursive: true });
-const out = { chainId, RealmLedger: ledger, ClanSiege: siege, RealmBadges: badges, relayer, deployer: account.address, deployedAt: new Date().toISOString() };
+const out = { chainId, RealmLedger: ledger, ClanSiege: siege, RealmBadges: badges, RealmDuels: duels, relayer, deployer: account.address, deployedAt: new Date().toISOString() };
 writeFileSync(join(root, 'deployments', `${chainId}.json`), JSON.stringify(out, null, 2) + '\n');
 execFileSync(process.execPath, ['--import', 'tsx', join(root, '..', 'packages', 'shared', 'scripts', 'gen-addresses.ts')], { stdio: 'inherit', cwd: join(root, '..', 'packages', 'shared') });
 console.log(`\nwrote deployments/${chainId}.json and packages/shared/src/deployments.json`);
