@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="Realm Raiders — your island, your General, your council of AI officers, and every raid provable on Monad." />
+    <meta name="theme-color" content="#0b171d" />
+    <title>Realm Raiders</title>
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <header class="hero">
+      <canvas id="hero3d" aria-hidden="true"></canvas>
+      <div class="hero-copy">
+        <div class="crest">⛨</div>
+        <h1>Realm Raiders</h1>
+        <p class="tag">Your island. Your General. Your council of AI officers — and every raid is provable.</p>
+        <div class="cta">
+          <a class="btn ember" href="/realm-raiders.apk" download>Download the Android APK</a>
+          <a class="btn ghost" href="#how">How it works</a>
+        </div>
+        <p class="fine">Android 7+ · sign in with Google or email · no wallet, no gas</p>
+      </div>
+    </header>
+
+    <main>
+      <section class="pitch">
+        <h2>The Emberwake Isles</h2>
+        <p class="flavour">
+          A storm-scarred forest realm of hill-top holdfasts, left behind when the sky-dragon Vharuun fell and broke the old continent.
+          Ember seeps up through the roots, and every lord wants it. Build your holdfast, raise a General, and raid your rivals.
+        </p>
+      </section>
+
+      <section class="trailer">
+        <div class="frame">
+          <video id="trailer" controls playsinline preload="none" poster="" aria-label="Trailer"></video>
+          <div class="placeholder">Trailer slot — drop <code>trailer.mp4</code> into <code>apps/landing/public/</code></div>
+        </div>
+      </section>
+
+      <section class="features">
+        <article>
+          <h3>Provable raids</h3>
+          <p>Your base is sealed in the Ledger before anyone attacks. The battle seed is locked on Monad before tick 0. The replay's hash is recorded after. Anyone can re-run it.</p>
+        </article>
+        <article>
+          <h3>A council of officers</h3>
+          <p>Five AI officers — your General, the Architect, the Strategist, the Night Captain and Whisper — plan raids by simulating them, redesign your walls, and keep watch while you sleep.</p>
+        </article>
+        <article>
+          <h3>Orders, not trust</h3>
+          <p>The Night Captain can only act inside the orders you sealed. Every autopilot action carries their hash, and the contract refuses anything else.</p>
+        </article>
+        <article>
+          <h3>Auto Mode</h3>
+          <p>Hand your realm to the officers for 30 minutes to 8 hours. They collect, build, re-save your base and raid — only inside the orders you locked on Monad — until you tap Take Control.</p>
+        </article>
+      </section>
+
+      <section id="how" class="how">
+        <h2>How a raid is proven</h2>
+        <ol>
+          <li><b>Seal.</b> <code>RealmLedger.sealBase(baseHash)</code> — the defender's layout is committed.</li>
+          <li><b>Lock the seed.</b> Commit (server secret + your nonce), then reveal in a later block. Neither side picks the seed alone.</li>
+          <li><b>Fight.</b> A deterministic integer engine runs the battle on your phone at 20 Hz.</li>
+          <li><b>Verify.</b> The server re-simulates the replay bytes; only a match is recorded with <code>recordResult(replayHash, …)</code>.</li>
+          <li><b>Reputation.</b> Your General is an ERC-8004 agent; verified battles become on-chain feedback.</li>
+        </ol>
+        <pre class="code">pnpm verify-replay packages/battle-engine/fixtures/golden-1.rrpl
+OK 0x0e3f15cb…aa4c  3★ 100%</pre>
+      </section>
+    </main>
+
+    <footer>
+      <p>Realm Raiders is an original game set in the Emberwake Isles. Built on Monad testnet.</p>
+    </footer>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

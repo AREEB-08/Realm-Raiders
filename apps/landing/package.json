@@ -1,0 +1,22 @@
+{
+  "name": "@realm/landing",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5180",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@fontsource/almendra": "5.3.0",
+    "@fontsource/cinzel": "5.3.0",
+    "three": "0.187.0"
+  },
+  "devDependencies": {
+    "@types/three": "0.187.0",
+    "typescript": "6.0.3",
+    "vite": "8.3.5"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "name": "@realm/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/index.ts",
+    "start": "tsx src/index.ts",
+    "seed": "tsx src/seed/index.ts",
+    "test": "vitest run",
+    "test:agents": "vitest run test/agents.test.ts",
+    "test:chain": "vitest run test/chain.test.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "lan": "tsx src/lan.ts"
+  },
+  "dependencies": {
+    "@fastify/cors": "11.4.0",
+    "@fastify/websocket": "11.3.6",
+    "@realm/battle-engine": "workspace:*",
+    "@realm/core": "workspace:*",
+    "@realm/game-data": "workspace:*",
+    "@realm/shared": "workspace:*",
+    "better-sqlite3": "13.0.3",
+    "drizzle-orm": "0.45.4",
+    "fastify": "5.12.8",
+    "jose": "6.2.15",
+    "qrcode": "1.5.4",
+    "tsx": "4.23.15",
+    "undici": "6.21.1",
+    "viem": "2.57.15",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^22.10.0",
+    "@types/ws": "^8.5.13",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0",
+    "ws": "^8.18.0"
+  }
+}

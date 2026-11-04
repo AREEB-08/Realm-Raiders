@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Play with Friends (spec F9): a friend's laptop hosts the game on the same Wi-Fi at
+  http://<lan-ip>:8787. Android can't allow cleartext by IP range, so this hackathon build
+  allows plain HTTP; everything on the internet (Monad RPC, Privy, the landing page) is HTTPS.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

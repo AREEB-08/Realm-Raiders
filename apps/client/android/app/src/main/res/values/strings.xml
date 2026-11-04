@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Realm Raiders</string>
+    <string name="title_activity_main">Realm Raiders</string>
+    <string name="package_name">xyz.realmraiders.app</string>
+    <string name="custom_url_scheme">xyz.realmraiders.app</string>
+</resources>

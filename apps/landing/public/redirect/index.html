@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Returning to Realm Raiders</title>
+    <style>
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #0b171d; color: #ece7dc; font: 16px system-ui, sans-serif; text-align: center; }
+      a { color: #ecc96b; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1 style="font-family: serif; color: #ecc96b">Returning to your holdfast…</h1>
+      <p>If the app did not open, <a id="open" href="#">tap here</a>.</p>
+    </main>
+    <script>
+      // Verified App Links open the app directly. If this page shows instead (App Link not
+      // verified yet), hand the OAuth params to the app through its custom scheme.
+      const q = location.search;
+      const link = 'xyz.realmraiders.app://redirect' + q;
+      document.getElementById('open').href = link;
+      setTimeout(() => (location.href = link), 400);
+    </script>
+  </body>
+</html>

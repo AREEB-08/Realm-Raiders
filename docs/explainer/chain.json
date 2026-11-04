@@ -1,0 +1,225 @@
+{
+  "fetchedAt": "2026-11-04T05:26:51.593Z",
+  "chainId": 10143,
+  "head": 76833310,
+  "contracts": [
+    {
+      "name": "RealmLedger",
+      "address": "0xec0e5ae643491f288f0332f695dc2f20fdbd0352",
+      "bytecodeBytes": 8835,
+      "sourcify": "perfect"
+    },
+    {
+      "name": "RealmBadges",
+      "address": "0xfe87d11da421427f0a72f587efc7dcc13f0d4d70",
+      "bytecodeBytes": 6459,
+      "sourcify": "perfect"
+    },
+    {
+      "name": "RealmDuels",
+      "address": "0x069d80675b73da9971620ac06c146e87262af3ca",
+      "bytecodeBytes": 3480,
+      "sourcify": "perfect"
+    }
+  ],
+  "txs": [
+    {
+      "label": "General registered as ERC-8004 agent",
+      "hash": "0x5af31284bba9350fd9946de8f10fb4904ee76dadc8cbc6daa81c09d51869af6a",
+      "status": "success",
+      "block": 76829418,
+      "to": "ERC-8004 Identity",
+      "gasUsed": 258338,
+      "logs": 4
+    },
+    {
+      "label": "BaseSealed (layout hash stored)",
+      "hash": "0x82039c59d4ed26ebf42acedbdd3acdec062c25677e9a4f2667877e181c829a17",
+      "status": "success",
+      "block": 76829431,
+      "to": "RealmLedger",
+      "gasUsed": 134164,
+      "logs": 1
+    },
+    {
+      "label": "BattleCommitted (secret seed committed)",
+      "hash": "0x454e6cb770814b4c5890c58e97ac135735c68792bd5abe6b3a5b9ac04aa1bbe8",
+      "status": "success",
+      "block": 76829478,
+      "to": "RealmLedger",
+      "gasUsed": 203579,
+      "logs": 1
+    },
+    {
+      "label": "SeedLocked (seed revealed + mixed)",
+      "hash": "0x2f7d1000377f47cfbba8d9116543e938c4f1925bab06e6d9ae7629b4a348871d",
+      "status": "success",
+      "block": 76829485,
+      "to": "RealmLedger",
+      "gasUsed": 71518,
+      "logs": 1
+    },
+    {
+      "label": "BattleResolved (result hash stored)",
+      "hash": "0x155754285d8e742793efa421eaad3b57cbfec111b7a2db346ba19ca722a62c1b",
+      "status": "success",
+      "block": 76829491,
+      "to": "RealmLedger",
+      "gasUsed": 106714,
+      "logs": 1
+    },
+    {
+      "label": "ERC-8004 reputation feedback",
+      "hash": "0xda4aa974353de2ef142597176d577625ce1ac5a0ecfe782c35076ad795736b8b",
+      "status": "success",
+      "block": 76829495,
+      "to": "ERC-8004 Reputation",
+      "gasUsed": 342306,
+      "logs": 1
+    },
+    {
+      "label": "Badge minted: First Raid",
+      "hash": "0x07ef20d40d926cb4865d76a25308363c94df695d550fa39695d56d6b425cee7f",
+      "status": "success",
+      "block": 76829500,
+      "to": "RealmBadges",
+      "gasUsed": 84303,
+      "logs": 1
+    },
+    {
+      "label": "Badge minted: Three-Star",
+      "hash": "0x7a9570a2e19b79a03412db210f59329bcd0610533379f26a16e143545c3c9d71",
+      "status": "success",
+      "block": 76829506,
+      "to": "RealmBadges",
+      "gasUsed": 84303,
+      "logs": 1
+    },
+    {
+      "label": "PolicyCommitted (night orders sealed)",
+      "hash": "0x25ff36bd42e4f3ed7f766b9b6b6fc99984e8d8ad0958bfbf7c11f031da3381e3",
+      "status": "success",
+      "block": 76829512,
+      "to": "RealmLedger",
+      "gasUsed": 115883,
+      "logs": 1
+    },
+    {
+      "label": "DefenseRecorded vs Briarholt (0 stars)",
+      "hash": "0xd47838a16a0572ae8ddd47e27d6fb7206abb95ff948e998c4c3327949f0afe59",
+      "status": "success",
+      "block": 76829529,
+      "to": "RealmLedger",
+      "gasUsed": 87019,
+      "logs": 1
+    },
+    {
+      "label": "DefenseRecorded vs Kragmoor (0 stars)",
+      "hash": "0x6eadecbd36cbd3b66de5a255d814d2c50d4ed81ff6c5814d9e8b7adbfde0cab3",
+      "status": "success",
+      "block": 76829556,
+      "to": "RealmLedger",
+      "gasUsed": 87019,
+      "logs": 1
+    },
+    {
+      "label": "DefenseRecorded vs Saltspire (0 stars)",
+      "hash": "0xa53a47622e6f3b30a4a4b9978acb4d01a001338f44bb80418c5d0bb1ca1a995d",
+      "status": "success",
+      "block": 76829578,
+      "to": "RealmLedger",
+      "gasUsed": 87005,
+      "logs": 1
+    },
+    {
+      "label": "AutopilotAction: repaired walls",
+      "hash": "0xb1cb4606f1f45ec8a42c3bfcbca517903942754b41cef1e453ced1ed529beaa7",
+      "status": "success",
+      "block": 76829534,
+      "to": "RealmLedger",
+      "gasUsed": 49443,
+      "logs": 1
+    },
+    {
+      "label": "AutopilotAction: struck back at the raiders",
+      "hash": "0xe0e666a0b34570de3c5cfa9bdbb51514a7128e7864619898db1f41f7eff7f10e",
+      "status": "success",
+      "block": 76829541,
+      "to": "RealmLedger",
+      "gasUsed": 49443,
+      "logs": 1
+    },
+    {
+      "label": "AutopilotAction: repaired walls",
+      "hash": "0x2844017d2093ad52e3220e04f778a5f8965bbee75a66135b381fcc79494d4997",
+      "status": "success",
+      "block": 76829562,
+      "to": "RealmLedger",
+      "gasUsed": 49443,
+      "logs": 1
+    },
+    {
+      "label": "AutopilotAction: repaired walls",
+      "hash": "0x2e9c887341575e2b7294c4065b6605288d3aaef242d0e1ff7ab6ae8519755941",
+      "status": "success",
+      "block": 76829584,
+      "to": "RealmLedger",
+      "gasUsed": 49443,
+      "logs": 1
+    },
+    {
+      "label": "PolicyCommitted (Auto Orders locked)",
+      "hash": "0x9055faea05ef05c23b3540a382f0f0e9deacb5ab8f7bf46211b30760adddd264",
+      "status": "success",
+      "block": 76829596,
+      "to": "RealmLedger",
+      "gasUsed": 115869,
+      "logs": 1
+    },
+    {
+      "label": "Auto: collected Gold and Timber",
+      "hash": "0xf22b044fcbac693c6c97efc4049aaffe873e093932f7733876f274a3e7512dc4",
+      "status": "success",
+      "block": 76829601,
+      "to": "RealmLedger",
+      "gasUsed": 49443,
+      "logs": 1
+    },
+    {
+      "label": "Auto: built a new Goldworks",
+      "hash": "0xff0675fd02f40b485bc4e3e778cb35f5d1254122ca51e816a610476922f6b819",
+      "status": "success",
+      "block": 76829606,
+      "to": "RealmLedger",
+      "gasUsed": 49443,
+      "logs": 1
+    },
+    {
+      "label": "Auto: moved 2 buildings (Architect's fix)",
+      "hash": "0xa5a4eb8928d411827091467c9a0bf06e15dc7f6bfb59b35dd3ac4ac18e111077",
+      "status": "success",
+      "block": 76829613,
+      "to": "RealmLedger",
+      "gasUsed": 49443,
+      "logs": 1
+    },
+    {
+      "label": "Auto: base re-sealed",
+      "hash": "0x7b68d0a5e9bf08f8a026719c212acc2890510cb3a72a49f8bf245864e0a7bee0",
+      "status": "success",
+      "block": 76829622,
+      "to": "RealmLedger",
+      "gasUsed": 49443,
+      "logs": 1
+    },
+    {
+      "label": "Auto: raided Kragmoor Deep, 3 stars, verified",
+      "hash": "0xb666ead3db907d4853ce38da9c5203b94cea51a183b3c95293ec565637d38a9d",
+      "status": "success",
+      "block": 76829647,
+      "to": "RealmLedger",
+      "gasUsed": 49443,
+      "logs": 1
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+* text=auto eol=lf
+*.rrpl binary
+*.glb binary
+*.ktx2 binary
+*.png binary
+*.webp binary
+*.jar binary
+*.keystore binary
+*.bat text eol=crlf
+*.cmd text eol=crlf

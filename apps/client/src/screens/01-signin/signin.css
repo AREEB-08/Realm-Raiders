@@ -1,0 +1,172 @@
+/* 01 — Sign in: a dusk forest diorama (code-drawn SVG layers), logo left, wooden panel right. */
+.signin {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #10261a;
+}
+.signin .sky {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #2b2a5a 0%, #6a4672 28%, #d77a52 50%, #f6b25c 58%, #2c5a3a 59%, #173822 100%);
+}
+.signin .sun {
+  position: absolute;
+  left: 62%;
+  top: 38%;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff3c4 0%, #ffcf6a 45%, rgba(255, 160, 80, 0) 70%);
+  filter: blur(1px);
+}
+.signin .ridge {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  background-repeat: repeat-x;
+  animation: drift 40s ease-in-out infinite alternate;
+}
+/* Pines: three shades, back to front. */
+.signin .ridge.far {
+  bottom: 34%;
+  height: 22%;
+  opacity: 0.85;
+  background-size: 180px 100%;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 100' preserveAspectRatio='none'><path d='M0 100 L0 70 L14 40 L28 70 L36 55 L50 22 L64 55 L72 48 L86 30 L100 60 L110 50 L124 20 L138 52 L150 44 L164 34 L180 66 L180 100 Z' fill='%234a6b6a'/></svg>");
+}
+.signin .ridge.mid {
+  bottom: 18%;
+  height: 26%;
+  background-size: 220px 100%;
+  animation-duration: 30s;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 100' preserveAspectRatio='none'><path d='M0 100 L0 60 L18 20 L36 62 L48 46 L66 8 L84 50 L96 40 L112 14 L130 56 L144 36 L160 4 L178 46 L192 34 L208 18 L220 52 L220 100 Z' fill='%23214a2e'/></svg>");
+}
+.signin .ridge.near {
+  bottom: -2%;
+  height: 30%;
+  background-size: 260px 100%;
+  animation-duration: 24s;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 100' preserveAspectRatio='none'><path d='M0 100 L0 50 L22 6 L44 52 L58 34 L80 0 L102 44 L118 26 L140 2 L162 46 L178 30 L200 4 L222 40 L240 22 L260 44 L260 100 Z' fill='%23102618'/></svg>");
+}
+.signin .hold {
+  position: absolute;
+  left: 58%;
+  bottom: 38%;
+  width: 150px;
+  height: 90px;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 90'><path d='M0 90 L20 60 L130 60 L150 90 Z' fill='%23233a2a'/><rect x='40' y='34' width='70' height='28' fill='%231a2a20'/><rect x='34' y='22' width='14' height='40' fill='%231a2a20'/><rect x='102' y='22' width='14' height='40' fill='%231a2a20'/><path d='M34 22 L41 12 L48 22 Z M102 22 L109 12 L116 22 Z' fill='%23142019'/><rect x='70' y='8' width='3' height='28' fill='%23142019'/><path d='M73 8 L92 12 L73 17 Z' fill='%23ff8a3d'/><rect x='58' y='44' width='4' height='6' fill='%23ffcf6a'/><rect x='88' y='44' width='4' height='6' fill='%23ffcf6a'/></svg>");
+}
+@keyframes drift {
+  to {
+    transform: translateX(4%);
+  }
+}
+.signin .embers i {
+  position: absolute;
+  bottom: -10px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #f6ff9a;
+  box-shadow: 0 0 10px #d6ff6a;
+  animation: rise 9s linear infinite;
+  opacity: 0;
+}
+@keyframes rise {
+  10% {
+    opacity: 0.9;
+  }
+  to {
+    transform: translate(40px, -90vh);
+    opacity: 0;
+  }
+}
+.signin-ui {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+  gap: 24px;
+  align-items: center;
+  padding: calc(var(--safe-top) + 16px) calc(var(--safe-right) + 28px) calc(var(--safe-bottom) + 16px) calc(var(--safe-left) + 28px);
+}
+.signin .logo {
+  text-align: left;
+}
+.signin .crest {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3a240f;
+  border: 4px solid var(--outline);
+  background: radial-gradient(circle at 40% 35%, #fff2b0, var(--attack) 60%, var(--attack-lo));
+  box-shadow: 0 0 30px rgba(255, 200, 90, 0.55), inset 0 -5px 0 rgba(0, 0, 0, 0.2);
+}
+.signin h1 {
+  font-family: var(--font-logo);
+  font-weight: 700;
+  font-size: clamp(34px, 6.5vw, 58px);
+  line-height: 1;
+  color: #ffe9a0;
+  letter-spacing: 0.03em;
+  text-shadow: 0 3px 0 #5b3816, 0 6px 0 rgba(0, 0, 0, 0.35), 0 0 30px rgba(255, 180, 80, 0.5);
+}
+.signin .logo p {
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff4dc;
+  text-shadow: var(--stroke-thin);
+  max-width: 380px;
+  margin: 10px 0 0;
+}
+.signin .panel {
+  width: 100%;
+  max-width: 380px;
+  justify-self: end;
+}
+.signin .g {
+  font-family: var(--font-body);
+  font-weight: 900;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--outline);
+  background: #fff;
+  color: #3a6fd8;
+  text-shadow: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+.signin .small-note {
+  font-size: 13px;
+  text-align: center;
+}
+.forging {
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 22px;
+  text-shadow: var(--stroke);
+}
+.seal-wax {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  border: 4px solid var(--outline);
+  background: radial-gradient(circle at 40% 35%, #ff7a5a, #b0301a);
+  color: #ffe2b0;
+  font-size: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 40px rgba(255, 120, 80, 0.55), inset 0 -6px 0 rgba(0, 0, 0, 0.25);
+}

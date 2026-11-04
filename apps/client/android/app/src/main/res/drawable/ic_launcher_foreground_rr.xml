@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Original Realm Raiders crest: a brass shield with an ember banner. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#C9A24A" android:strokeColor="#2A1A06" android:strokeWidth="2"
+        android:pathData="M54,26 L76,35 V54 C76,68 66,78 54,83 C42,78 32,68 32,54 V35 Z" />
+    <path android:fillColor="#E8743B" android:strokeColor="#2A1A06" android:strokeWidth="1.5"
+        android:pathData="M44,42 H64 L59,52 L64,64 H44 L49,52 Z" />
+</vector>

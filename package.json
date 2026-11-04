@@ -1,0 +1,36 @@
+{
+  "name": "realm-raiders",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "pnpm@10.34.9",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @realm/server --filter @realm/client dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "node scripts/check-originality.mjs && pnpm --filter @realm/battle-engine test -- banned",
+    "check:originality": "node scripts/check-originality.mjs",
+    "verify-replay": "tsx tools/verify-replay.ts",
+    "test:determinism": "pnpm --filter @realm/battle-engine test:determinism",
+    "seed": "pnpm --filter @realm/server seed",
+    "dev:local": "pnpm --filter @realm/client dev",
+    "android": "pnpm --filter @realm/client build && pnpm --filter @realm/client exec cap sync android && pnpm --filter @realm/client exec cap run android",
+    "apk": "pnpm --filter @realm/client build && pnpm --filter @realm/client exec cap sync android && node scripts/gradle.mjs assembleDebug",
+    "apk:release": "node scripts/apk-release.mjs",
+    "contracts:build": "pnpm --filter @realm/contracts build",
+    "e2e": "pnpm --filter @realm/client e2e",
+    "screens": "pnpm --filter @realm/client screens",
+    "digest": "pnpm --filter @realm/battle-engine digest",
+    "hooks:install": "node -e \"require('fs').writeFileSync('.git/hooks/pre-commit','#!/bin/sh\nexec node scripts/pre-commit.mjs\n',{mode:0o755})\"",
+    "dev:lan": "pnpm --filter @realm/server lan"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3"
+  }
+}

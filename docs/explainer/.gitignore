@@ -1,0 +1,4 @@
+# raw captures (img/ holds the compressed copies the PDF uses) and the assembled page
+shots/
+explainer.built.html
+web.html

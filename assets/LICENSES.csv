@@ -1,0 +1,6 @@
+path,source_url,author,licence,date,notes
+apps/client/node_modules/@fontsource/cinzel,https://github.com/google/fonts/tree/main/ofl/cinzel,Natanael Gama,OFL-1.1,2026-11-03,UI headings
+apps/client/node_modules/@fontsource/almendra,https://github.com/google/fonts/tree/main/ofl/almendra,Ana Sanfelippo,OFL-1.1,2026-11-03,flavour text
+(procedural) apps/client/src/game/art.ts,—,Realm Raiders,original,2026-11-03,All island/building/troop/projectile art is painted in code at runtime
+(procedural) apps/client/src/three/*.ts,—,Realm Raiders,original,2026-11-03,The General and the Stormwyrm are built from Three.js primitives
+(procedural) apps/client/src/audio/sfx.ts,—,Realm Raiders,original,2026-11-03,All sound effects are synthesised with Web Audio

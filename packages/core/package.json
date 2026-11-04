@@ -1,0 +1,24 @@
+{
+  "name": "@realm/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@realm/battle-engine": "workspace:*",
+    "@realm/game-data": "workspace:*",
+    "@realm/shared": "workspace:*",
+    "viem": "2.57.15",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3",
+    "vitest": "5.1.0"
+  }
+}

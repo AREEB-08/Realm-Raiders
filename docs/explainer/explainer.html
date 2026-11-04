@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Realm Raiders: how it was built</title>
+<style>
+@font-face { font-family: 'Cinzel'; font-weight: 400; src: url('../../apps/landing/node_modules/@fontsource/cinzel/files/cinzel-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Cinzel'; font-weight: 700; src: url('../../apps/landing/node_modules/@fontsource/cinzel/files/cinzel-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Almendra'; font-weight: 400; src: url('../../apps/landing/node_modules/@fontsource/almendra/files/almendra-latin-400-normal.woff2') format('woff2'); }
+
+@page {
+  size: A4;
+  margin: 15mm 16mm 17mm 16mm;
+  @bottom-left { content: "Realm Raiders: how it was built"; font: 7.5pt 'Segoe UI', sans-serif; color: #8a969b; }
+  @bottom-right { content: counter(page) " / " counter(pages); font: 7.5pt 'Segoe UI', sans-serif; color: #8a969b; }
+}
+@page :first { margin: 0; @bottom-left { content: none; } @bottom-right { content: none; } }
+
+:root { --ink: #16323d; --teal: #1d5566; --ember: #d9652b; --brass: #a87b25; --monad: #5b45e0; --muted: #5b6b72; --line: #dde3e5; --green: #2f7d4f; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.1pt; line-height: 1.5; color: #1f2a2e; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+p { margin: 0 0 7pt; }
+ul, ol { margin: 0 0 8pt; padding-left: 15pt; }
+li { margin-bottom: 2.5pt; }
+b, strong { color: #13262e; }
+a { color: var(--teal); text-decoration: none; }
+code, .mono { font-family: Consolas, 'Cascadia Mono', monospace; font-size: 8.6pt; }
+code { background: #f1f4f5; padding: 0.5pt 2.5pt; border-radius: 2pt; }
+
+/* ---------- cover ---------- */
+.cover { width: 210mm; height: 297mm; position: relative; overflow: hidden; background: #0b171d; color: #ece7dc; break-after: page; }
+.cover .hero { position: absolute; inset: 0 0 auto 0; height: 150mm; background: url('img/cover.jpg') center top / cover no-repeat; }
+.cover .hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,23,29,0) 0%, rgba(11,23,29,0) 62%, #0b171d 100%); }
+.cover .titles { position: absolute; top: 128mm; left: 0; right: 0; text-align: center; }
+.cover .kicker { font: 700 9pt 'Segoe UI'; letter-spacing: 3pt; color: #e8a46b; text-transform: uppercase; }
+.cover h1 { font-family: 'Cinzel'; font-weight: 700; font-size: 40pt; margin: 2mm 0 0; color: #f5e7c4; letter-spacing: 1pt; border: 0; padding: 0; }
+.cover .sub { font-family: 'Almendra'; font-size: 15pt; color: #e9dcc0; margin-top: 1mm; }
+.cover .phones { position: absolute; top: 174mm; left: 0; right: 0; display: flex; justify-content: center; gap: 8mm; align-items: flex-start; }
+.cover .phones img { width: 41mm; border-radius: 3mm; border: 0.8mm solid #000; box-shadow: 0 2mm 6mm rgba(0,0,0,0.5); }
+.cover .phones img:nth-child(2) { margin-top: -5mm; }
+.cover .foot { position: absolute; bottom: 12mm; left: 16mm; right: 16mm; display: flex; justify-content: space-between; font-size: 8.5pt; color: #9aa8af; border-top: 0.3mm solid #2b3d45; padding-top: 3mm; }
+
+/* ---------- headings ---------- */
+h1 { font-family: 'Cinzel'; font-weight: 700; font-size: 21pt; color: var(--ink); margin: 0 0 3mm; padding-bottom: 1.5mm; border-bottom: 0.6mm solid var(--brass); line-height: 1.15; }
+.chapter { margin-top: 11mm; }
+.chead, .keep { break-inside: avoid; }
+thead { display: table-header-group; }
+.newpage { break-before: page; margin-top: 0; }
+.quotes { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5mm 5mm; margin: 3mm 0 4mm; }
+.quotes figure { margin: 0; }
+.quotes img { width: 100%; display: block; border-radius: 2mm; }
+.quotes figcaption { margin-top: 1mm; }
+.num { display: block; font: 700 8.5pt 'Segoe UI'; letter-spacing: 2.4pt; text-transform: uppercase; color: var(--ember); margin-bottom: 1mm; }
+h2 { font-family: 'Cinzel'; font-weight: 700; font-size: 12.8pt; color: var(--teal); margin: 5mm 0 2mm; break-after: avoid; }
+h3 { font-size: 10.6pt; font-weight: 700; color: var(--ink); margin: 3.5mm 0 1.2mm; break-after: avoid; }
+.lead { font-size: 11pt; color: #33444a; }
+
+/* ---------- blocks ---------- */
+.simple { background: #fff4ec; border-left: 1.2mm solid var(--ember); padding: 2.6mm 3.5mm; margin: 3mm 0; border-radius: 0 2mm 2mm 0; break-inside: avoid; }
+.simple::before { content: 'In simple words'; display: block; font: 700 7.8pt 'Segoe UI'; letter-spacing: 1.6pt; text-transform: uppercase; color: var(--ember); margin-bottom: 0.8mm; }
+.simple p:last-child, .note p:last-child { margin-bottom: 0; }
+.note { background: #eef5f7; border-left: 1.2mm solid var(--teal); padding: 2.4mm 3.5mm; margin: 3mm 0; border-radius: 0 2mm 2mm 0; break-inside: avoid; }
+.note.green { background: #ecf6ef; border-color: var(--green); }
+.note.purple { background: #f1effd; border-color: var(--monad); }
+.quote { font-family: 'Almendra'; font-size: 11.2pt; color: #4a3b22; }
+
+figure { margin: 3mm 0 4mm; break-inside: avoid; }
+figure svg.diagram { width: 100%; height: auto; display: block; font-family: 'Segoe UI', sans-serif; }
+figcaption { font-size: 8.4pt; color: var(--muted); margin-top: 1.5mm; line-height: 1.4; }
+figcaption b { color: var(--ink); }
+.legend { font-size: 8.8pt; margin-top: 2mm; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5mm 6mm; }
+.legend div { display: flex; gap: 2mm; align-items: flex-start; }
+.dot { flex: none; width: 4.6mm; height: 4.6mm; border-radius: 50%; color: #fff; font: 800 7.8pt 'Segoe UI'; display: inline-flex; align-items: center; justify-content: center; margin-top: 0.3mm; }
+
+.phones { display: flex; gap: 4.5mm; justify-content: center; align-items: flex-start; margin: 3mm 0; break-inside: avoid; }
+.phone { width: 41mm; flex: none; }
+.phone img { width: 100%; display: block; border-radius: 3mm; border: 0.8mm solid #0e1416; }
+.phone .cap { font-size: 8.1pt; line-height: 1.35; color: #36474d; margin-top: 1.6mm; }
+.phone .cap b { display: block; font-family: 'Cinzel'; font-size: 8.6pt; color: var(--ink); }
+.phones.sm .phone { width: 37mm; }
+.phones.tour .phone { width: 40.5mm; }
+
+.split { display: grid; grid-template-columns: 46mm 1fr; gap: 6mm; align-items: start; margin: 3mm 0; break-inside: avoid; }
+.split.two { grid-template-columns: 46mm 46mm 1fr; }
+.split .phone { width: 100%; }
+.split > div > p:first-child { margin-top: 0; }
+
+.shot { width: 100%; border-radius: 2mm; border: 0.3mm solid #c9d1d4; display: block; }
+
+table { width: 100%; border-collapse: collapse; font-size: 8.8pt; margin: 2.5mm 0 4mm; break-inside: auto; }
+th { background: var(--ink); color: #fff; text-align: left; font-weight: 600; padding: 1.6mm 2.2mm; }
+td { padding: 1.4mm 2.2mm; border-bottom: 0.25mm solid var(--line); vertical-align: top; }
+tr:nth-child(even) td { background: #f7f9fa; }
+tr { break-inside: avoid; }
+td.mono, td .mono { font-size: 7.9pt; word-break: break-all; }
+.ok { color: var(--green); font-weight: 700; }
+
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin: 3mm 0 4mm; break-inside: avoid; }
+.kpi { border: 0.3mm solid var(--line); border-top: 1mm solid var(--brass); border-radius: 1.5mm; padding: 2.2mm 2.6mm; background: #fcfbf7; }
+.kpi .v { font-family: 'Cinzel'; font-weight: 700; font-size: 15.5pt; color: var(--ink); line-height: 1.1; }
+.kpi .l { font-size: 8pt; color: var(--muted); line-height: 1.3; margin-top: 0.8mm; }
+
+.bars { margin: 2mm 0 4mm; break-inside: avoid; }
+.bar { display: grid; grid-template-columns: 40mm 1fr 30mm; gap: 3mm; align-items: center; font-size: 8.8pt; margin-bottom: 1.3mm; }
+.bar .track { height: 3.6mm; background: #eef1f2; border-radius: 1mm; overflow: hidden; }
+.bar .fill { height: 100%; background: var(--teal); border-radius: 1mm; }
+.bar .n { color: var(--muted); font-size: 8.2pt; }
+
+.toc { columns: 2; column-gap: 9mm; font-size: 9.8pt; margin: 2mm 0 4mm; }
+.toc div { break-inside: avoid; padding: 1.1mm 0; border-bottom: 0.25mm dotted #c9d1d4; }
+.toc span { color: var(--ember); font-weight: 700; display: inline-block; width: 7mm; }
+
+.cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+.term { break-inside: avoid; margin-bottom: 2.2mm; font-size: 9.2pt; }
+.term b { color: var(--teal); }
+pre { font-family: Consolas, monospace; font-size: 8.2pt; background: #10202a; color: #dfe8eb; padding: 3mm 3.5mm; border-radius: 2mm; white-space: pre-wrap; margin: 2mm 0 4mm; break-inside: avoid; line-height: 1.45; }
+pre .c { color: #8fb3c0; }
+.avoid { break-inside: avoid; }
+/* landscape screenshots (the app is landscape since the enhancement) */
+.lands { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm 5mm; margin: 3mm 0; break-inside: avoid; }
+.land img { width: 100%; display: block; border-radius: 2mm; border: 0.6mm solid #0e1416; }
+.land .cap { font-size: 8.1pt; line-height: 1.35; color: #36474d; margin-top: 1.2mm; }
+.land .cap b { display: block; font-family: 'Cinzel'; font-size: 8.6pt; color: var(--ink); }
+</style>
+</head>
+<body>
+
+<!-- ================================================================ COVER -->
+<section class="cover">
+  <div class="hero"></div>
+  <div class="titles">
+    <div class="kicker">Project report</div>
+    <h1>Realm Raiders</h1>
+    <div class="sub">What was built, how it works, and how it was made</div>
+  </div>
+  <div class="phones">
+    <img src="img/home.jpg" alt="Home island" />
+    <img src="img/battle.jpg" alt="Battle" />
+    <img src="img/result.jpg" alt="Verified result" />
+  </div>
+  <div class="foot">
+    <span>Android island-raid strategy game · Monad testnet · AI officers</span>
+    <span>3 November 2026</span>
+  </div>
+</section>
+
+<!-- ================================================================ OVERVIEW -->
+<section>
+  <span class="num">Start here</span>
+  <h1>The one-page version</h1>
+  <p class="lead"><b>Realm Raiders</b> is a strategy game for Android phones. You build a castle on an island, create a 3D General, and raid other islands. Five AI "officers" advise you. The result of every raid is written to the <b>Monad</b> blockchain, so anyone can check that nobody cheated.</p>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v">17</div><div class="l">landscape screens, from sign-in to a Live Duel with a friend</div></div>
+    <div class="kpi"><div class="v">5</div><div class="l">AI officers running on a local Qwen3 model</div></div>
+    <div class="kpi"><div class="v">4 + 2</div><div class="l">smart contracts live and verified on Monad testnet, plus the 2 official ERC-8004 registries</div></div>
+    <div class="kpi"><div class="v">≈33k</div><div class="l">lines of code in 250 source files</div></div>
+    <div class="kpi"><div class="v">208</div><div class="l">automated tests passing, plus 20 browser play-throughs and 3 Android runs</div></div>
+    <div class="kpi"><div class="v">22 / 22</div><div class="l">real Monad transactions confirmed "success"</div></div>
+    <div class="kpi"><div class="v">12–24 ms</div><div class="l">to simulate a whole 3-minute battle</div></div>
+    <div class="kpi"><div class="v">5.7 MB</div><div class="l">signed release APK (debug build: 7.1 MB)</div></div>
+  </div>
+
+  <h2>What was built</h2>
+  <ul>
+    <li><b>The phone app</b>: 17 landscape screens with a base-builder HUD, an isometric island in a code-drawn forest with pinch zoom, troops and buildings modelled in 3D and baked into sprites on the phone, a 3D General creator, synthesised sound effects and original background music. All art is made by code; none of it was downloaded.</li>
+    <li><b>Gems and Auto Mode</b>: an in-game currency earned only by playing, spent on letting the officers run the realm under orders sealed on chain — every move checked and logged.</li>
+    <li><b>Play with Friends</b>: on the same Wi-Fi, raid a friend while they watch live, fight a Live Duel on one shared seed (recorded on the new <i>RealmDuels</i> contract).</li>
+    <li><b>The battle engine</b>: the rulebook for every fight. It gives exactly the same result on any phone or computer, which is what makes raids provable.</li>
+    <li><b>The game server</b>: stores players and bases, re-checks every battle, runs the AI officers, and sends the blockchain transactions.</li>
+    <li><b>Five AI officers</b>: General, Architect, Strategist, Night Captain and Intelligence Officer. They speak through a Qwen language model, but every answer is checked. If an answer fails a check, the officer uses its built-in rules instead.</li>
+    <li><b>Smart contracts on Monad</b>: <i>RealmLedger</i> (bases, seeds, results, night and Auto orders), <i>RealmBadges</i> (achievements) and <i>RealmDuels</i> (Live Duel results). Each General is also registered as an <b>ERC-8004 agent</b> with an on-chain reputation.</li>
+    <li><b>The rest</b>: an <b>Android app</b> package, a <b>landing website</b>, and a <b>replay-checking tool</b> anyone can run.</li>
+  </ul>
+
+  <h2>Contents</h2>
+  <div class="toc">
+    <div><span>1</span>The game in simple words</div>
+    <div><span>2</span>Architecture: the big picture</div>
+    <div><span>3</span>How the code is organised</div>
+    <div><span>4</span>The battle engine</div>
+    <div><span>5</span>How a raid is proven</div>
+    <div><span>6</span>The smart contracts on Monad</div>
+    <div><span>7</span>The five AI officers</div>
+    <div><span>8</span>Night defence</div>
+    <div><span>9</span>The phone app, screen by screen</div>
+    <div><span>10</span>The 3D General, art and sound</div>
+    <div><span>11</span>Online, offline and Android</div>
+    <div><span>12</span>The landing website and tools</div>
+    <div><span>13</span>How it was built</div>
+    <div><span>14</span>Proof that it works</div>
+    <div><span>15</span>What is not done yet</div>
+    <div><span>16</span>How to run it and glossary</div>
+  </div>
+</section>
+
+
+<!-- ================================================================ WHAT'S NEW -->
+<section class="chapter newpage">
+  <span class="num">What's new</span>
+  <h1>The enhancement, in eight phases and a play-test</h1>
+  <p>After the first release the game was rebuilt in eight checked phases, each with its own tests and report. The rules never changed underneath old battles: the battle engine gained a <b>version 2</b>, and every recorded raid still re-simulates under the rules it was fought with.</p>
+  <table>
+    <tr><th style="width:22%">Phase</th><th>What changed</th></tr>
+    <tr><td><b>1 Bugs</b></td><td>Wall lines that place all-or-nothing with the exact reason; zoom and drag that never get swallowed; a Profile that loads fast and shares an image.</td></tr>
+    <tr><td><b>2 Camera</b></td><td>Pinch and wheel zoom about the finger; drag to pan with a fling; long-press to pick a building up.</td></tr>
+    <tr><td><b>3 Landscape</b></td><td>A base-builder HUD in landscape, bevelled buttons, bundled fonts, and an island in a forest drawn by code (about 730 batched trees).</td></tr>
+    <tr><td><b>4 Troops</b></td><td>Swordsman, Archer, Stone Giant, Ember Mage, Fire Dragon (and the Sapper and General) with real counters — engine v2, integer maths, the old rules frozen as v1.</td></tr>
+    <tr><td><b>5 3D</b></td><td>Every troop and building modelled in Three.js, baked on the phone into 5-direction × 22-frame sprite sheets ("Forging your army…", about 1 s), cached; fire, fireball, slam and arrow effects.</td></tr>
+    <tr><td><b>6 Gems + Auto</b></td><td>Gems earned only by playing; Auto Mode lets the officers collect, build, raid and defend under sealed Auto Orders, every move logged on chain.</td></tr>
+    <tr><td><b>7 Friends</b></td><td><code>pnpm dev:lan</code> hosts a room on a laptop; phones find it on the Wi-Fi; raid a friend while they watch live; Live Duels on one shared seed recorded on <i>RealmDuels</i>.</td></tr>
+    <tr><td><b>8 Polish</b></td><td>Synthesised sounds for every new attack, tutorial tips, the signed release APK, and this document.</td></tr>
+    <tr><td><b>Play-test pass</b></td><td>Wall lines painted by dragging, with corners filled in; a Shop with pictures where every Citadel-1 building can be bought and placed (a ghost, then ✓); a calmer, symmetric home screen in plain words; pinch that hands over cleanly to a drag; no white flashing on hit buildings; a bigger Fire Dragon with a shadow and breath from its mouth; full-screen target scouting; original background music. The Clan Siege was removed.</td></tr>
+  </table>
+
+  <h2>Old proofs stay true</h2>
+  <p>A replay records which rules it was fought under. The v1 rules are frozen in code, and the server fixes a battle's version when it is committed, so a v1 army can never be scored against a v2 seed. The stability fingerprints (200 seeded battles hashed together) are pinned for both versions and checked in Node, Chrome and the Android WebView:</p>
+  <table>
+    <tr><th>Rules</th><th>Fingerprint</th><th>Goldens</th></tr>
+    <tr><td>v1 (launch, frozen)</td><td><code>0xc0afd396…1037ebe</code></td><td>3 replays, byte-identical since launch</td></tr>
+    <tr><td>v2 (current)</td><td><code>0xebb7fe98…65330d5dc6</code></td><td>3 new replays (sword rush, giants + sappers, dragon)</td></tr>
+  </table>
+
+  <h2>Auto Mode: orders, not trust</h2>
+  <p>The officers act on a fixed 5-minute beat. Before anything happens, each move is checked against the sealed Auto Orders (raids per hour, minimum win chance, Gold reserve, what to upgrade first, strike back, storm-shield) and logged with <code>logAutopilot</code> under the session's own on-chain id. A refused move is written to the Auto Log with its reason — "Refused: upgrade Citadel to level 2 (would leave 1500 Gold, orders keep 1950)" — and nothing happens. A closed offline realm catches up on exactly the beats it missed.</p>
+  <div class="lands">
+    <div class="land"><img src="img/l-17c-auto-running.jpg" /><div class="cap"><b>Auto Mode running</b>The officers are in charge; manual play waits for TAKE CONTROL.</div></div>
+    <div class="land"><img src="img/l-17d-auto-log.jpg" /><div class="cap"><b>The Auto Log</b>Collected, upgraded, re-sealed, raided — each with its Ledger entry.</div></div>
+  </div>
+
+  <h2>Play with Friends: the replay is the battle</h2>
+  <p>When you raid a friend, your phone streams the actions it applied every half second. Their phone runs the same deterministic battle a moment behind — so what they watch is exactly what the host then verifies. In a Live Duel, one commit-reveal locks a single seed for both commanders; both replays are re-simulated, the winner is decided by stars, then %, then time, and the result goes on chain (<i>RealmDuels</i>, verified on Sourcify).</p>
+  <div class="lands">
+    <div class="land"><img src="img/l-15b-duel-battle.jpg" /><div class="cap"><b>Live Duel</b>"You 2★ 64% · Brannoc 1★ 48%" updates every 500 ms.</div></div>
+    <div class="land"><img src="img/l-16-duel-result.jpg" /><div class="cap"><b>Duel recorded on Monad ✓</b>Both replays re-simulated by the host.</div></div>
+  </div>
+</section>
+
+<!-- ================================================================ 1 GAME -->
+<section class="chapter newpage">
+  <span class="num">Chapter 1</span>
+  <h1>The game in simple words</h1>
+  <p>The game is set in the <b>Emberwake Isles</b>, an original world: a cold northern sea of storm-cut islands, left behind when a sky-dragon fell and broke the old continent. Every lord wants <i>ember</i>, the glowing stuff that washes up on the shores.</p>
+  <p>You are a lord with one island. During the <b>day</b> you build and raid. At <b>night</b> you give orders and go to sleep, and your AI officers defend the island within those orders. In the morning you read what happened.</p>
+
+  <figure>
+    {{LOOP}}
+    <figcaption><b>Figure 1. The game loop.</b> Small numbers in the corners are the screen numbers in chapter 9.</figcaption>
+  </figure>
+
+  <h2>The pieces of the game</h2>
+  <table>
+    <tr><th style="width:24%">Thing</th><th>What it is</th></tr>
+    <tr><td><b>Resources</b></td><td><b>Gold</b> and <b>Timber</b> for building, <b>Ember</b> for the rare troops. Mines and camps produce them over time; you tap a building to collect.</td></tr>
+    <tr><td><b>Buildings (14)</b></td><td>Citadel (your main keep), Goldworks, Treasury, Lumber Camp, Timber Yard, Ember Well, Muster Hall, War Camp, the defences (Bowyer Tower, Stonethrower, Rune Obelisk, Wyrm Ballista), Stone Wall and Caltrop Pit (a trap).</td></tr>
+    <tr><td><b>Troops (7)</b></td><td>Swordsman (cheap front line), Archer (shoots over walls), Sapper (breaks walls), Stone Giant (goes for defences first), Ember Mage (a fan of three fireballs), Fire Dragon (flies, breathes a fire cone), and your <b>General</b>, a hero with a <b>Rally</b> power.</td></tr>
+    <tr><td><b>Gems</b></td><td>Earned only by playing (daily login, first raid of the day, 3-star raids, badges, duel wins) and spent on Auto Mode. Gems can't be bought.</td></tr>
+    <tr><td><b>Stars</b></td><td>A raid earns up to 3 stars: one for destroying half the island, one for the Citadel, and one for destroying all of it.</td></tr>
+    <tr><td><b>Renown and ranks</b></td><td>Winning gives Renown. Ranks go Squire → Knight (100) → Banneret (300) → Warden (700) → High Marshal (1,500).</td></tr>
+    <tr><td><b>Rivals</b></td><td>Three computer-run islands to raid: <b>Briarholt</b> (easy), <b>Kragmoor Deep</b> (medium) and <b>Saltspire Eyrie</b> (hard). Their lords also raid you at night.</td></tr>
+    <tr><td><b>Badges</b></td><td>First Seal, First Raid, Three-Star, Night Watch and Architect's Pupil. They are <i>soulbound</i> tokens on the chain: they can't be sold or moved.</td></tr>
+  </table>
+
+  <div class="lands">
+    <div class="land"><img src="img/l-03-home.jpg" /><div class="cap"><b>Your island</b>Resources top-right, advisers on the left, Auto on the right, ATTACK and the Shop in the corners.</div></div>
+    <div class="land"><img src="img/l-07-battle.jpg" /><div class="cap"><b>A raid</b>The seed is "locked" on the chain before the fight starts.</div></div>
+    <div class="land"><img src="img/l-08-result.jpg" /><div class="cap"><b>The result</b>Stars, then a checklist proving the fight was fair.</div></div>
+    <div class="land"><img src="img/l-04b-shop.jpg" /><div class="cap"><b>The Shop</b>A picture of every building, its price and how many you can still build.</div></div>
+  </div>
+
+  <div class="cols2" style="margin-top:2mm">
+    <div>
+      <h2 style="margin-top:0">What makes it different</h2>
+      <ul>
+        <li><b>Every raid is provable.</b> You don't have to trust the game's server; anyone can re-run a raid and compare it with the public record.</li>
+        <li><b>AI officers with real jobs.</b> They plan raids by actually simulating them, check your walls, and write your reports, and they can't invent numbers.</li>
+        <li><b>The AI acts while you sleep</b>, but only inside orders you sealed. Each action is logged against those orders.</li>
+        <li><b>No crypto knowledge needed.</b> No wallet to set up, no gas to pay.</li>
+        <li><b>Works offline.</b> With no server around, the whole game runs on the phone.</li>
+      </ul>
+    </div>
+    <div>
+      <h2 style="margin-top:0">A new player's first ten minutes</h2>
+      <ol>
+        <li>Tap <b>Guest commander</b> (or Google/email when set up).</li>
+        <li>Style a 3D <b>General</b>, give them a name, and raise them. They get an on-chain agent ID.</li>
+        <li>Land on the <b>home island</b>. The General says what to do first.</li>
+        <li>Open <b>Build</b> and tap <b>SAVE BASE</b>. The layout's fingerprint goes on chain, so raids on you can be judged fairly.</li>
+        <li>Tap <b>ATTACK</b>, swipe to Briarholt, and let the Strategist test three plans.</li>
+        <li>Tap <b>ATTACK!</b> (the battle seed is locked on chain), watch or take control, and get a "Fair play verified ✓" result.</li>
+        <li>In the evening, save <b>night orders</b>. Next morning, read the <b>report</b>.</li>
+        <li>Turn on <b>Auto Mode</b> and let the officers play inside the orders you locked.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ 2 ARCHITECTURE -->
+<section class="chapter newpage">
+  <span class="num">Chapter 2</span>
+  <h1>Architecture: the big picture</h1>
+  <p>The system has four big parts: the <b>phone</b>, the <b>server</b>, the <b>AI model</b> and the <b>blockchain</b>. Under them is a set of <b>shared packages</b> that run on both the phone and the server. That shared code is the key idea of the design.</p>
+  <figure>
+    {{ARCH}}
+    <figcaption><b>Figure 2. The whole system.</b> Each numbered link is explained below.</figcaption>
+    <div class="legend">
+      <div><span class="dot" style="background:#1d5566">1</span><span><b>Phone ↔ server.</b> The app asks for data (your island, targets, reports) and sends its battle replays. The server pushes live updates over a <i>WebSocket</i> (Auto Mode moves, friend raids, duels, night raids, officer messages).</span></div>
+      <div><span class="dot" style="background:#7a52c7">2</span><span><b>Server ↔ AI model.</b> The officer runner sends a question plus the true game facts. The model replies in a fixed JSON format, and the runner checks the reply before anyone sees it.</span></div>
+      <div><span class="dot" style="background:#5b45e0">3</span><span><b>Server ↔ Monad.</b> A <i>relayer</i> wallet on the server sends the transactions and pays the gas, so players never need crypto. An <i>indexer</i> reads the events back.</span></div>
+      <div><span class="dot" style="background:#a87b25">4</span><span><b>Shared packages.</b> The same game data, battle rules and game services are built into both the app and the server, so the two always agree.</span></div>
+    </div>
+  </figure>
+
+  <div class="simple">
+    <p>Think of a football match with a referee. The <b>battle engine</b> is the rulebook, and the phone and the server each have an identical copy. Your phone plays the match. The server, as referee, replays it from your recording using the same rulebook. If the two copies of the rules agree, the result is stamped into a public notebook (the <b>Monad blockchain</b>) where nobody can change it. The <b>AI officers</b> are coaches who give advice, but they can only use numbers that really exist.</p>
+  </div>
+
+  <h2>Why it is built this way</h2>
+  <ul>
+    <li><b>Fair raids without trusting anyone.</b> Battles run on the phone, so they are smooth and work offline. Because the engine is <i>deterministic</i> (chapter 4), the server can re-run any battle and catch a faked result.</li>
+    <li><b>One codebase, two places.</b> The game services (<code>packages/core</code>) run on the server <i>and</i> inside the app. With no server in reach, the whole game still runs on the phone.</li>
+    <li><b>No crypto knowledge needed.</b> Players never see a wallet or pay gas. The server's relayer pays for the transactions, and players see a simple "Saved ✓" chip (on the live chain: "Monad ✓", which opens the explorer).</li>
+    <li><b>AI that can't break the game.</b> Officers give advice and draft orders, but every answer is checked, and actions on your behalf must fit orders you sealed on chain (chapter 8).</li>
+  </ul>
+</section>
+
+<!-- ================================================================ 3 CODE MAP -->
+<section class="chapter">
+  <span class="num">Chapter 3</span>
+  <h1>How the code is organised</h1>
+  <p>Everything lives in one folder, <code>realm-raiders/</code>, as a <b>monorepo</b>: one repository holding several small packages that use each other. The <b>pnpm</b> package manager links them. All the code is <b>TypeScript</b> (JavaScript with types), except the contracts, which are <b>Solidity</b>.</p>
+  <figure>
+    {{PACKAGES}}
+    <figcaption><b>Figure 3. Package map.</b> Data flows left to right: numbers, then rules, then formats, then game services, then the app and the server.</figcaption>
+  </figure>
+
+  <h2>Size of each part</h2>
+  <div class="bars">{{BARS}}</div>
+
+  <table>
+    <tr><th style="width:23%">Folder</th><th>What is inside, in plain words</th></tr>
+    <tr><td><code>packages/game-data</code></td><td>Every number in the game: building and troop stats, costs, the economy, ranks, badges and the three rival islands. If you want to rebalance the game, this is the only place to edit.</td></tr>
+    <tr><td><code>packages/battle-engine</code></td><td>The battle rules: movement, path-finding, targeting, damage, traps, the General's rally, stars. It also handles replays (record and re-play), the replay hash, and the verifier. It uses integer maths only (chapter 4).</td></tr>
+    <tr><td><code>packages/shared</code></td><td>Agreements between the app, the server and the chain: request and response shapes, how bases are turned into bytes and hashed, the contract interfaces (ABIs), the night-order rules, and the Monad chain settings.</td></tr>
+    <tr><td><code>packages/core</code></td><td>The game services, one per feature: home, General, base, targets, War Room, battle, night, Auto Mode, Play with Friends, profile. It also holds a rule-based "field manual" for each officer and a mock blockchain for offline play.</td></tr>
+    <tr><td><code>apps/server</code></td><td>The <b>Fastify</b> web server: API routes, WebSocket hub, <b>SQLite</b> database, login sessions, a pool of worker threads that re-check battles, the AI officer runner with its prompts, and the <b>viem</b> relayer and indexer for Monad.</td></tr>
+    <tr><td><code>apps/client</code></td><td>The phone app: <b>React</b> screens 01–12, <b>Phaser</b> scenes for the island and battle, <b>Three.js</b> for the 3D General and the baked troops, sound effects and music, and the <b>Capacitor</b> Android project.</td></tr>
+    <tr><td><code>apps/landing</code></td><td>The download website, with a 3D island at the top and the Android "App Links" file.</td></tr>
+    <tr><td><code>contracts</code></td><td>Solidity contracts, their tests, and scripts to compile, deploy and verify them.</td></tr>
+    <tr><td><code>tools</code>, <code>scripts</code></td><td><code>verify-replay</code> (anyone can re-check a raid), <code>live-run</code> (plays every on-chain moment end to end), an asset importer, an originality check, and a pre-commit guard that blocks secrets from being committed.</td></tr>
+  </table>
+</section>
+
+<!-- ================================================================ 4 ENGINE -->
+<section class="chapter">
+  <span class="num">Chapter 4</span>
+  <h1>The battle engine</h1>
+  <p>The engine is the heart of the game. Give it an island, an army, a seed and the list of your taps, and it plays out the whole battle, tick by tick. It runs inside the app (in a background <i>Web Worker</i>, so the screen never freezes) and on the server (in a pool of worker threads).</p>
+
+  <figure>
+    {{ENGINE}}
+    <figcaption><b>Figure 4. One battle.</b> 20 ticks per second, at most 3 minutes. The output is the result, a small replay file, and its fingerprint (hash).</figcaption>
+  </figure>
+
+  <h2>The one rule: same input, same answer, everywhere</h2>
+  <div class="simple">
+    <p>Different phones can round decimal numbers slightly differently. Over thousands of steps, a tiny difference grows until one phone says "3 stars" and another says "2 stars". To prevent this, the engine never uses decimals. Distances, health and timers are all <b>whole numbers</b>: one tile is 1,000 units, and health is counted in thousandths of a point. Then every device gets exactly the same answer, like a recipe followed to the gram.</p>
+  </div>
+  <ul>
+    <li><b>Its own dice.</b> Randomness comes from a small built-in generator called <i>sfc32</i>, started from the battle's seed. Same seed, same "random" events.</li>
+    <li><b>No risky maths.</b> No square roots, sines or decimal division. The engine has its own integer square root and a 16-direction compass. A test scans the engine's source code and fails if anyone uses <code>Math.random</code>, <code>Math.sqrt</code>, <code>Date</code> and similar functions.</li>
+    <li><b>Smart path-finding.</b> Troops find their way with <i>flow fields</i>: picture water flowing downhill toward every target at once. Walls count as "expensive" ground, so troops go around them unless breaking through is shorter.</li>
+    <li><b>Fingerprints.</b> The replay is hashed with <i>keccak256</i>, the same hash Ethereum and Monad use, so the contract can store it and anyone can compare.</li>
+  </ul>
+
+  <h2>Proof that it really is identical</h2>
+  <div class="split">
+    <div class="phone"><img src="img/devsim.jpg" /><div class="cap"><b>/dev/sim</b>A hidden page (tap the sign-in crest 7 times) that runs 200 random battles and 3 recorded "golden" battles on the device itself.</div></div>
+    <div>
+      <figure style="margin-top:0">{{DETERMINISM}}</figure>
+      <p>The engine plays <b>200 battles with random seeds</b> and combines all their results into one fingerprint. That fingerprint is stored in a test. It came out <b>exactly the same</b> in Node.js on the PC, in desktop Chrome, and inside the real Android app on the emulator (Android 17, Chrome 145 WebView).</p>
+      <p>Three recorded <b>golden battles</b> also replay to the same hash, with check-hashes every 100 ticks along the way. If someone changes the rules by accident, these tests fail at once.</p>
+      <p><b>Speed:</b> a full battle takes about <b>12–24 ms</b> to simulate. The War Room runs 3 plans × 50 battles = <b>150 practice battles in about 1.3 seconds</b> on the server.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ 5 RAID PROOF -->
+<section class="chapter">
+  <span class="num">Chapter 5</span>
+  <h1>How a raid is proven</h1>
+  <p>A cheater could try two things: <b>pick a lucky seed</b> (re-rolling the dice until the battle goes their way), or <b>send a fake result</b>. The raid flow below blocks both.</p>
+  <figure>
+    {{SEQUENCE}}
+    <figcaption><b>Figure 5. A raid, step by step.</b> Grey dashed lines are the three actors. Labels in italics are the events written to the Monad blockchain.</figcaption>
+  </figure>
+  <div class="simple">
+    <p><b>The seed is a dice roll nobody can secretly choose.</b> First the server puts a secret in a "sealed envelope" by publishing only its hash on the chain (<i>commit</i>). A few blocks later it opens the envelope (<i>reveal</i>). The final seed mixes that secret with a random number from the player and data from the blockchain block itself. The server can't change its secret after committing, and the player can't predict the block data. So neither side can pick a lucky seed alone.</p>
+  </div>
+  <p><b>The result can't be faked.</b> The phone sends a <b>replay</b>, the list of what you tapped and when, not the result. The server re-runs it with the same engine. Only if the stars, percentage and hash match does it record the result on chain. The replay also carries a copy of the defender's base, checked against the hash that was sealed on chain before the raid.</p>
+
+  <div class="split two">
+    <div class="phone"><img src="img/warroom.jpg" /><div class="cap"><b>Before</b>The War Room shows the target's base "Sealed in the Ledger ✓" before you can lock the seed.</div></div>
+    <div class="phone"><img src="img/result.jpg" /><div class="cap"><b>After</b>"Verified on Monad": seed locked, replay hash, server re-simulation, result recorded, reputation.</div></div>
+    <div>
+      <h3>Anyone can check, not just the server</h3>
+      <ul>
+        <li>On the <b>Profile</b> screen, the <i>verify</i> button downloads a battle's replay and re-runs it <b>on your phone</b>.</li>
+        <li>On a computer, <code>pnpm verify-replay &lt;battleId&gt; --chain</code> re-simulates the replay and checks it against what RealmLedger stored for that battle: the <b>seed</b>, the <b>base hash</b>, the <b>replay hash</b>, the <b>stars</b> and the <b>destruction %</b>. A live raid passed <b>all 5</b>.</li>
+      </ul>
+      <p class="note" style="margin-top:3mm">In this screenshot the chips say "mock" because the phone was playing offline. In live mode the same chips link to real Monad transactions (chapter 6).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ 6 CONTRACTS -->
+<section class="chapter">
+  <span class="num">Chapter 6</span>
+  <h1>The smart contracts on Monad</h1>
+  <p>A <b>smart contract</b> is a small program stored on a blockchain. Once deployed, its code and data are public and nobody can quietly change them. Realm Raiders uses four of its own contracts plus the two official <b>ERC-8004</b> registries, a shared standard for giving AI agents an on-chain identity and reputation.</p>
+  <figure>
+    {{CONTRACTS}}
+    <figcaption><b>Figure 6. Who calls what.</b> The relayer wallet on the server sends every transaction and pays the gas. Where a contract needs the player's own consent, such as sealing a base or committing night orders, the player's signature travels with the transaction (<code>sealBaseFor</code>, <code>commitPolicyFor</code>).</figcaption>
+  </figure>
+
+  <h2>Deployed and verified</h2>
+  <p>The contracts were deployed to <b>Monad testnet</b> (chain 10143) on 3 November 2026, and <b>RealmDuels</b> on 4 November 2026. Their source code is <b>verified</b> on Sourcify (the verifier behind the MonadVision explorer): anyone can read the exact Solidity that runs at each address. The data below was read live from the chain when this document was made ({{FETCHED}}).</p>
+  <table>
+    <tr><th>Contract</th><th>Address</th><th>Code size</th><th>Source verified</th></tr>
+    {{CONTRACT_ROWS}}
+  </table>
+
+  <h2>How they were written and tested</h2>
+  <ul>
+    <li>Written in <b>Solidity 0.8.38</b> on top of <b>OpenZeppelin 5.6.1</b>, a widely used library for roles, tokens and signatures.</li>
+    <li>Compiled with <b>solc-js</b> and tested on an <b>in-memory Ethereum machine</b> (<i>@ethereumjs/vm</i>). 9 tests cover sealing, the commit–reveal seed, results, defences, night orders, autopilot rules, badges, duel results and the retired siege contract.</li>
+    <li>Deployed with a <b>viem</b> script, then verified with a Sourcify script. The usual Foundry toolkit couldn't be installed on this PC, so this route replaced it (chapter 15).</li>
+    <li>Badges use <b>ERC-1155</b> with transfers switched off ("soulbound").</li>
+  </ul>
+</section>
+
+<section class="newpage">
+  <h2 style="margin-top:0">Real transactions on Monad testnet</h2>
+  <p>The <code>tools/live-run.ts</code> script played every on-chain moment of the game through the real server and the real chain. Each row below was read back from the Monad RPC: all 15 transactions are confirmed with status <span class="ok">success</span>.</p>
+  <table>
+    <tr><th style="width:34%">What happened in the game</th><th>Contract</th><th>Block</th><th>Gas</th><th>Status</th><th style="width:24%">Transaction</th></tr>
+    {{TX_ROWS}}
+  </table>
+  <p style="font-size:8.6pt;color:#5b6b72">Each transaction can be opened at <code>testnet.monadvision.com/tx/&lt;hash&gt;</code>. Later, the real APK on the emulator also played a live raid: its General became agent <b>#2563</b>, the reputation registry showed 1 verified battle with an average score of 100.</p>
+</section>
+
+<!-- ================================================================ 7 OFFICERS -->
+<section class="chapter">
+  <span class="num">Chapter 7</span>
+  <h1>The five AI officers</h1>
+  <p>Each player has a council of five officers. They speak in character and give useful advice, but they are never trusted blindly.</p>
+  <table>
+    <tr><th style="width:23%">Officer</th><th>What they do</th><th style="width:22%">Where you meet them</th></tr>
+    <tr><td><b>Your General</b><br/><span style="color:#5b6b72">the name you chose</span></td><td>Greets you each morning with a short briefing (base sealed? best target? treasury) and speaks on your profile. Their personality (Bold, Cunning, Steadfast or Merry) changes the tone.</td><td>02 creator, 03 home, 12 profile</td></tr>
+    <tr><td><b>Master Mason Orrin</b><br/><span style="color:#5b6b72">Architect</span></td><td>Studies your layout ("2 stores sit outside the walls") and can propose a fix that moves buildings for you.</td><td>04 build, 10 report</td></tr>
+    <tr><td><b>Captain Sefa Brightspear</b><br/><span style="color:#5b6b72">Strategist</span></td><td>Runs 50 practice battles for each of 3 plans, recommends one, and takes your coaching ("more sappers"). Calls out live tips during the raid.</td><td>06 War Room, 07 battle</td></tr>
+    <tr><td><b>Watch-Captain Hale</b><br/><span style="color:#5b6b72">Night Captain</span></td><td>Drafts your night orders: what to repair first, how much gold to keep in reserve, when to strike back, and when to raise the storm-shield.</td><td>09 night orders</td></tr>
+    <tr><td><b>Whisper</b><br/><span style="color:#5b6b72">Intelligence Officer</span></td><td>Scouting notes on targets, a battle report after each raid (MVP, key moments), and the Morning Report summary.</td><td>05 targets, 08 result, 10 report</td></tr>
+  </table>
+
+  <figure>
+    {{OFFICERS}}
+    <figcaption><b>Figure 7. How an officer answers.</b> The model only supplies the wording. The facts come from the game, and a failed check falls back to rules.</figcaption>
+  </figure>
+
+  <div class="simple">
+    <p>Language models sometimes invent things. So each officer gets the <b>real facts</b> (your gold, the win rates from the practice battles, and so on) and must reply in a fixed format. A check then looks at <b>every number</b> in the reply. If a number doesn't appear in the facts, the reply is thrown away and the officer answers from its <b>field manual</b>, a set of written rules that always works. The screen tags those answers "(field manual)", so you always know which kind you got.</p>
+  </div>
+
+  <h2>Which model, and how fast</h2>
+  <ul>
+    <li>The live officers use <b>Qwen3 4B</b> running locally through <b>Ollama</b>, so no API keys or cloud costs. A hosted Qwen can be plugged in with two settings and is tried first.</li>
+    <li>Qwen3 normally "thinks out loud" before answering, which took about 10 seconds. Switching that off (<code>reasoning_effort: "none"</code>) and using the 4B model brought answers to <b>1.8–3.2 seconds</b>, inside the 4-second budget.</li>
+    <li>The greeting, the briefing, the night draft and the War Room advice were answered live by the model during testing. The other officers fall back cleanly when the model is slow.</li>
+  </ul>
+
+  <h2>The officers speaking</h2>
+  <p>Close-ups from the app. These were taken on an offline run, so every bubble comes from the officers' built-in rules. With the server and model running, the same bubbles are filled by Qwen. Notice that every number they quote comes from the game.</p>
+  <div class="quotes">
+    <figure><img src="img/q_general.jpg" /><figcaption><b>The General</b> (here "Brannoc") gives the morning briefing on the home screen.</figcaption></figure>
+    <figure><img src="img/q_whisper.jpg" /><figcaption><b>Whisper</b> reports on a raid: MVP and the key moments, taken from the battle's event log.</figcaption></figure>
+    <figure><img src="img/q_architect.jpg" /><figcaption><b>Master Mason Orrin</b> reviews the layout and offers a 2-move fix.</figcaption></figure>
+    <figure><img src="img/q_strategist.jpg" /><figcaption><b>Captain Sefa</b> sums up 150 practice raids and picks the fastest plan.</figcaption></figure>
+  </div>
+  <figure style="width:60%;margin:0 auto 3mm"><img src="img/q_night.jpg" style="width:100%;border-radius:2mm" /><figcaption><b>Watch-Captain Hale</b> turns the night-order sliders into plain-language rules before you seal them.</figcaption></figure>
+</section>
+
+<!-- ================================================================ 8 NIGHT -->
+<section class="chapter">
+  <span class="num">Chapter 8</span>
+  <h1>Night defence</h1>
+  <h2>Orders, not trust</h2>
+  <p>At night, rival lords send small <b>raiding parties</b> (troop space of 4 + 2 × their Citadel level, and no General) against your island. You are asleep, so your officers act for you, but only inside the orders you sealed.</p>
+  <figure>
+    {{NIGHT}}
+    <figcaption><b>Figure 8. A night.</b> The orders' hash goes on chain <i>before</i> the night. Each autopilot action carries that hash, and the contract only accepts actions logged against the orders you committed.</figcaption>
+  </figure>
+  <div class="split two">
+    <div class="phone"><img src="img/night.jpg" /><div class="cap"><b>09 Night orders</b>Repair first: walls, defences or resources. Gold kept in reserve: 45%. Strike back: yes. Storm-shield at 60%.</div></div>
+    <div class="phone"><img src="img/report.jpg" /><div class="cap"><b>10 Morning Report</b>Each raid with stars and a DefenseRecorded proof. Each autopilot action is marked "within orders ✓".</div></div>
+    <div>
+      <p>The report also shows actions that were <b>refused</b>. For example, "Struck back at the raiders' boats (Citadel delta 1)" is refused because the orders only allow striking back at raiders whose Citadel is at most 0 levels above yours.</p>
+      <p>From the report, the Architect can apply a layout fix in one tap. The base is then "unsealed" until you seal it again.</p>
+      <div class="note purple"><p>In the live run, the night produced <b>2 DefenseRecorded</b> and <b>4 AutopilotAction</b> transactions on Monad (see the table in chapter 6).</p></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ================================================================ 9 SCREENS -->
+<section class="chapter">
+  <span class="num">Chapter 9</span>
+  <h1>The phone app, screen by screen</h1>
+  <p>The app has 17 screens, numbered in the order a new player meets them, and it plays in <b>landscape</b> (a portrait browser is asked to rotate). The pictures below come from the app in a 20:9 phone-sized window; <code>pnpm screens</code> retakes them at 16:9, 19.5:9 and 20:9 and fails if anything scrolls sideways.</p>
+  <div class="lands">
+    <div class="land"><img src="img/l-01-sign-in.jpg" /><div class="cap"><b>01 Sign in</b>Google, email, or <i>Guest commander</i>; the note says whether you are online or in the offline realm.</div></div>
+    <div class="land"><img src="img/l-02-raise-your-general.jpg" /><div class="cap"><b>02 Raise your General</b>A 3D figure you style — temper, banner, look and name — then registered as an ERC-8004 agent.</div></div>
+  </div>
+  <div class="lands">
+    <div class="land"><img src="img/l-03-home.jpg" /><div class="cap"><b>03 Home island</b>Badge top-left, resources and Gems top-right; Builder, Night and Reports on the left, Auto and Settings on the right; ATTACK and Friends bottom-left, Build and Shop bottom-right.</div></div>
+    <div class="land"><img src="img/l-03b-how-to-earn-gems.jpg" /><div class="cap"><b>03b How to earn Gems</b>"Gems can't be bought." The only way to get them is to play.</div></div>
+  </div>
+  <div class="lands">
+    <div class="land"><img src="img/l-04-build-and-seal.jpg" /><div class="cap"><b>04 Build</b>Tap a building to upgrade it, long-press to move it. <i>Walls</i>: drag a finger to paint a wall line. <i>SAVE BASE</i> puts the layout's fingerprint on chain.</div></div>
+    <div class="land"><img src="img/l-04b-shop.jpg" /><div class="cap"><b>04b Shop</b>Defences, Resources, Army and Walls &amp; Traps, each with a picture, price and "Built 1/2"; tap one, place the ghost, ✓.</div></div>
+  </div>
+  <div class="lands">
+    <div class="land"><img src="img/l-05-find-a-target.jpg" /><div class="cap"><b>05 Find a target</b>The rival's base fills the screen so you can scout it; arrows go to the next rival (friends on your Wi-Fi too), then ATTACK.</div></div>
+    <div class="land"><img src="img/l-06-war-room.jpg" /><div class="cap"><b>06 War Room</b>Sefa tries every plan 50 times first: each card shows its win %, stars, time and cost; give Sefa an order to change the plan.</div></div>
+  </div>
+  <div class="lands">
+    <div class="land"><img src="img/l-07-battle.jpg" /><div class="cap"><b>07 Battle</b>3D-baked troops face their path; fire cones, fireballs, fist slams and arrow trails. Autoplay or take control.</div></div>
+    <div class="land"><img src="img/l-08-result.jpg" /><div class="cap"><b>08 Result</b>Stars, loot and Gems earned, Whisper's report, and "Fair play verified ✓" with <i>How we know</i> for the proof.</div></div>
+  </div>
+  <div class="lands">
+    <div class="land"><img src="img/l-09-night-captain.jpg" /><div class="cap"><b>09 Night Captain</b>Draft, adjust and save tonight's orders; <i>Simulate tonight</i> plays the night now.</div></div>
+    <div class="land"><img src="img/l-10-morning-report.jpg" /><div class="cap"><b>10 Morning Report</b>The night's raids and autopilot actions — and a new Auto Log tab.</div></div>
+  </div>
+  <div class="lands">
+    <div class="land"><img src="img/l-12b-profile-battles.jpg" /><div class="cap"><b>12b Battles</b>Every raid with its stars; VERIFY re-runs it on the phone and compares it with the chain.</div></div>
+    <div class="land"><img src="img/l-12-profile.jpg" /><div class="cap"><b>12 Profile</b>Rank, badges, ERC-8004 identity and reputation, battles with VERIFY.</div></div>
+  </div>
+  <div class="lands">
+    <div class="land"><img src="img/l-12c-profile-gems.jpg" /><div class="cap"><b>12c Gems history</b>Every change to your Gems: "+5 First raid today · −4 Auto Mode 1 hour".</div></div>
+    <div class="land"><img src="img/l-13-play-with-friends.jpg" /><div class="cap"><b>13 Play with Friends</b>Searches your Wi-Fi for a host, or type its address and the room code.</div></div>
+  </div>
+  <div class="lands">
+    <div class="land"><img src="img/l-14-lobby.jpg" /><div class="cap"><b>14 Lobby</b>Who is in the room, status chips, READY, emotes, and RAID FRIEND · LIVE DUEL.</div></div>
+    <div class="land"><img src="img/l-15-live-duel.jpg" /><div class="cap"><b>15 Live Duel</b>Both bases sealed, one shared seed locked, 3 minutes: pick a plan against your friend's base.</div></div>
+  </div>
+  <div class="lands">
+    <div class="land"><img src="img/l-15b-duel-battle.jpg" /><div class="cap"><b>15b Duel battle</b>The mini-bar shows both commanders' stars and % live.</div></div>
+    <div class="land"><img src="img/l-16-duel-result.jpg" /><div class="cap"><b>16 Duel result</b>Both replays re-simulated by the host; the result is recorded on RealmDuels.</div></div>
+  </div>
+  <div class="lands">
+    <div class="land"><img src="img/l-17-auto-mode-duration.jpg" /><div class="cap"><b>17 Auto Mode: how long?</b>30 minutes to 8 hours, 2 Gems per half-hour.</div></div>
+    <div class="land"><img src="img/l-17b-auto-orders.jpg" /><div class="cap"><b>17b Auto Orders</b>Drafted by Watch-Captain Hale, editable, then sealed on chain like night orders.</div></div>
+  </div>
+  <div class="lands">
+    <div class="land"><img src="img/l-17c-auto-running.jpg" /><div class="cap"><b>17c Auto Mode running</b>Glowing border, the countdown, the live action feed and a big TAKE CONTROL.</div></div>
+    <div class="land"><img src="img/l-17d-auto-log.jpg" /><div class="cap"><b>17d Auto Log</b>Every move, ✓ within orders or ✗ refused, each with its Ledger entry.</div></div>
+  </div>
+  <h2>How the screens are made</h2>
+  <ul>
+    <li><b>React 19</b> draws the menus, panels and chat bubbles. A small store holds the player's state and refreshes the home screen every 8 seconds.</li>
+    <li><b>Phaser 4</b> draws the island and the battle in <i>isometric</i> view (the diamond-shaped 2.5D look). Buildings, troops, arrows and effects are painted with code on a canvas.</li>
+    <li>The battle screen plays the engine's ticks as animation. The real simulation runs in a <b>Web Worker</b>, so the drawing stays smooth.</li>
+    <li>Every "✓" chip (for example <i>SeedLocked ✓ 0xf180…8f8b</i>) is a link to the transaction on the explorer. In offline mode it shows "mock".</li>
+    <li>The fonts are <b>Lilita One</b> (buttons and titles) and <b>Nunito</b> (text), with <b>Cinzel</b> kept for the logo; all are bundled open-licence fonts, so the app needs no internet for them.</li>
+    <li>Troops and buildings are <b>Three.js</b> models baked on the phone into sprite sheets (5 directions mirrored to 8, idle/walk/attack/death), cached in IndexedDB; without WebGL the game keeps its 2D drawings.</li>
+  </ul>
+  <div>
+    <div>
+      <h3>Small things that make it feel like a game</h3>
+      <ul>
+        <li>Coins float up when you collect, with a sound.</li>
+        <li>Stars "pop" in one by one on the result screen.</li>
+        <li>Officers show a typing shimmer while they think.</li>
+        <li>A red dot on an officer means they have news.</li>
+        <li>If the server is slow, a "Courier delayed" banner appears instead of an error.</li>
+        <li>A <i>Share card</i> on the profile makes a picture of your General and record to share.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ 10 GENERAL / ART -->
+<section class="chapter">
+  <span class="num">Chapter 10</span>
+  <h1>The 3D General, art and sound</h1>
+  <p>No art was downloaded or bought. Every picture in the game is <b>generated by code</b> when the app runs. This keeps the game original and the app small (5.6 MB).</p>
+  <div class="split two">
+    <div class="phone"><img src="img/general.jpg" /><div class="cap"><b>Creator</b>A 3D figure on a turntable, rebuilt live as you change options.</div></div>
+    <div class="phone"><img src="img/profile.jpg" /><div class="cap"><b>Same General, profile</b>The figure spins on its plinth above your rank and badges.</div></div>
+    <div>
+      <h3>How the General is made</h3>
+      <ol>
+        <li><b>Built from blocks.</b> Three.js assembles head, body, cloak, shield and weapon from simple shapes. Your choices (body, head, hair, cloak, weapon, shield, colours and faction) are stored as a small checked "appearance" record.</li>
+        <li><b>Fingerprinted.</b> The appearance is hashed and stored with the General, so the same record always rebuilds the same figure.</li>
+        <li><b>Portrait painted.</b> The 3D figure is rendered once to a square image, used in the officer bubbles and the share card.</li>
+        <li><b>Battle sprite baked.</b> The figure is also rendered small from the battle camera's angle, so the General in the 2D battle matches your 3D one.</li>
+      </ol>
+      <h3>The rest of the art</h3>
+      <ul>
+        <li><b>Island and battle:</b> buildings, walls, troops and effects are drawn with Canvas 2D shapes, in the colours of your faction.</li>
+        <li><b>Landing page:</b> a 3D island with a castle, trees and a glowing sea.</li>
+        <li><b>Sound and music:</b> taps, deploys, shots, explosions, coins, building, stars and the victory tune are made live with the Web Audio API, and so are two original background tunes (a calm one at home, a drum-driven one in battle; on/off in Settings). The APK ships no audio files.</li>
+        <li><b>App icon:</b> a vector "adaptive icon" for Android.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="note"><p>An <b>originality check</b> (<code>pnpm check:originality</code>) scans all 285 source files for names, terms and asset paths from other games and fails the build if it finds any. The world, names and look are original to Realm Raiders.</p></div>
+</section>
+
+<!-- ================================================================ 11 MODES + ANDROID -->
+<section class="chapter">
+  <span class="num">Chapter 11</span>
+  <h1>Online, offline and Android</h1>
+  <h2>Two ways to play</h2>
+  <figure>
+    {{MODES}}
+    <figcaption><b>Figure 9. Choosing a mode.</b> The app tries each server address in its list. If none answers, it starts the offline realm, using the same game-services code as the server.</figcaption>
+  </figure>
+  <p>Because <code>packages/core</code> runs on the phone too, the offline realm is the <i>real</i> game, not a demo: the same rules, the same economy, and the same raid checks. It only swaps the database for an in-memory store (saved on the phone), the blockchain for a mock ledger, and the AI model for the field manuals.</p>
+
+  <h2>Turning the web app into an Android app</h2>
+  <ul>
+    <li><b>Capacitor 8</b> wraps the built web app in a native Android shell (a <i>WebView</i>), giving a normal installable <b>APK</b>.</li>
+    <li>Portrait only, single window, an adaptive vector icon, and <b>App Links</b>, so links to the website can open the app. The website publishes an <code>assetlinks.json</code> file with the fingerprints of the signing keys.</li>
+    <li>Two builds: <b>debug</b> (7.1 MB, may talk to a plain-http server on the PC for testing) and <b>release</b> (5.6 MB, signed with a private release key kept outside the project folder).</li>
+  </ul>
+
+  <h2>Testing on a real Android system</h2>
+  <p>A script (<code>e2e-android/apk-playthrough.ts</code>) uses <b>Playwright</b> to drive the <b>installed APK</b> on the Android emulator, through the app's own WebView: sign in → create General → seal base → War Room → raid → verified result → night orders → morning report → Auto Mode → profile. It took the screenshots in this report and checks that no page errors happen. It passed <b>live</b> (against the server and Monad) and <b>offline</b>.</p>
+  <div class="note"><p><b>Problems found only on the phone, and fixed:</b> Android blocked plain-http calls from the app (allowed in debug builds only). The server refused the phone's <code>PUT</code> requests until its CORS settings listed them (a test now covers it). The WebView quietly switched image links to https, so images are now loaded as blobs. Portrait links pointed to "localhost", which is the phone itself, so they are now rewritten to the server's address.</p></div>
+</section>
+
+<!-- ================================================================ 12 LANDING + TOOLS -->
+<section class="chapter newpage">
+  <span class="num">Chapter 12</span>
+  <h1>The landing website and tools</h1>
+  <figure>
+    <img class="shot" src="img/landing.jpg" />
+    <figcaption><b>The landing page</b> (<code>apps/landing</code>): a Three.js island under a night sky, with the download button and a "How it works" link.</figcaption>
+  </figure>
+  <div class="split" style="grid-template-columns: 1fr 1fr;">
+    <figure style="margin:0"><img class="shot" src="img/landing_cards.jpg" /><figcaption>Further down: four feature cards and the 5 steps of "How a raid is proven".</figcaption></figure>
+    <div>
+      <h3>Also on the site</h3>
+      <ul>
+        <li><code>/.well-known/assetlinks.json</code> for Android App Links.</li>
+        <li><code>/redirect</code>, the page the Google/email login comes back to, which reopens the app.</li>
+        <li>A slot for a trailer video, empty for now.</li>
+      </ul>
+      <h3>Tools</h3>
+      <ul>
+        <li><b>verify-replay</b>: re-checks a replay file or a battle ID, optionally against the chain.</li>
+        <li><b>live-run</b>: plays every on-chain moment through the API and prints explorer links.</li>
+        <li><b>digest</b> and <b>make-golden</b>: produce the determinism fingerprint and the golden battles.</li>
+        <li><b>assets/import</b>: ready for adding free (CC0) art packs later.</li>
+      </ul>
+    </div>
+  </div>
+<pre><span class="c"># anyone can re-check the first golden battle</span>
+pnpm verify-replay packages/battle-engine/fixtures/golden-1.rrpl
+OK 0x0e3f15cb…  3★ 100%</pre>
+</section>
+
+<!-- ================================================================ 13 HOW BUILT -->
+<section class="chapter">
+  <span class="num">Chapter 13</span>
+  <h1>How it was built</h1>
+  <p>The work followed the project guide (<code>main_project/Project_Guide.md</code>), which splits the game into <b>12 phases</b>. Each phase ended with working, tested code before the next began. After phase 11 came the go-live step: deploying to Monad and play-testing the APK.</p>
+  <figure>
+    {{PHASES}}
+    <figcaption><b>Figure 10. The build order.</b> The engine came first because everything else depends on it. The chain was added after the game already worked offline.</figcaption>
+  </figure>
+
+  <h2>The building blocks used</h2>
+  <table>
+    <tr><th style="width:26%">Tool</th><th>Used for</th></tr>
+    <tr><td>TypeScript 6, pnpm 10, Node 22</td><td>The language, the package manager and the runtime for everything except the contracts.</td></tr>
+    <tr><td>Vite 8, Vitest 5</td><td>Building the app and website quickly; running the 140 unit tests.</td></tr>
+    <tr><td>React 19, Phaser 4, Three.js</td><td>Screens, the 2D isometric island and battle, the 3D General and boss.</td></tr>
+    <tr><td>Capacitor 8, Android SDK, Gradle</td><td>Packaging the app as an APK and signing it.</td></tr>
+    <tr><td>Fastify 5, SQLite, Drizzle, jose</td><td>The server, its database, and login sessions (signed tokens).</td></tr>
+    <tr><td>viem</td><td>Talking to Monad: sending transactions, reading events, deploying.</td></tr>
+    <tr><td>Solidity, OpenZeppelin, solc-js, ethereumjs VM</td><td>Writing, compiling and testing the smart contracts.</td></tr>
+    <tr><td>Ollama + Qwen3 4B</td><td>The local language model behind the officers.</td></tr>
+    <tr><td>Playwright</td><td>Automatic play-throughs in Chrome and on the Android emulator.</td></tr>
+  </table>
+
+  <h2>How each phase was done</h2>
+  <ol>
+    <li><b>Write the numbers first</b> (game-data), then the rules (engine), with tests for every rule: walls block, sappers break walls, drakelings fly over, traps trigger, the rally works.</li>
+    <li><b>Lock the rules down</b> with golden replays and the 200-battle fingerprint, so later work can't change battles by accident.</li>
+    <li><b>Build the game loop offline</b>, then move the same services to the server and add the database and logins.</li>
+    <li><b>Add the chain behind a switch</b>: a mock chain for development and tests, and the live chain with a real relayer for Monad.</li>
+    <li><b>Add the AI last</b>, with a rule-based field manual written first, so the game never depends on the model being up.</li>
+    <li><b>Play it on a phone</b>, fix what breaks there, deploy, and play again live.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Problems met along the way, and the fixes</h2>
+  <table>
+    <tr><th style="width:36%">Problem</th><th>Fix</th></tr>
+    <tr><td>Battles first took 30–40 ms each, too slow for 150 practice battles.</td><td>Added a "can walk here" grid and a faster queue for path-finding, and let troops spread apart only every other tick. Now 12–24 ms.</td></tr>
+    <tr><td>The fingerprint test caught the clock (<code>Date</code>) being used in the digest script.</td><td>Removed it. This is exactly what the "banned functions" test is for.</td></tr>
+    <tr><td>Night raiders 3-starred every starter base.</td><td>Raid armies could only grow, never shrink, to fit the attacker. Now they scale both ways, night raiders come without a General, and the starter base got its two caltrop traps.</td></tr>
+    <tr><td>The local AI took about 10 seconds per answer.</td><td>Turned off its "thinking" step and moved from the 8B to the 4B model: about 2 seconds.</td></tr>
+    <tr><td>The AI sometimes invented numbers, or said a plan "stalls at 100%".</td><td>Added the number-grounding check and a contradiction check. Failing answers fall back to the field manual.</td></tr>
+    <tr><td>On the phone, the game canvas filled only a quarter of the screen.</td><td>Made the canvas fit its container with CSS, and moved the sea background onto the canvas itself.</td></tr>
+    <tr><td>The 3D boss view didn't appear on first open.</td><td>Made its container always render, and fixed the camera framing.</td></tr>
+    <tr><td>The Foundry toolkit couldn't be installed (blocked on this PC).</td><td>Compiled with solc-js, tested on an in-memory EVM, and deployed with a viem script instead.</td></tr>
+    <tr><td>Android-only issues: http blocked, PUT refused, images upgraded to https, "localhost" portraits.</td><td>Debug-only mixed content, explicit CORS methods (with a test), blob-loaded images, and portrait links rewritten to the server's address.</td></tr>
+    <tr><td>An old resize listener crashed after leaving a screen ("reading 'setZoom'").</td><td>The listener is now detached when the scene shuts down, and guarded.</td></tr>
+  </table>
+
+  <h2>Keeping secrets safe</h2>
+  <p>The relayer's private key, the session secret and the release-signing password live in files that git ignores (<code>.env</code>, <code>keystore.properties</code>), and the release key file sits outside the project folder. A <b>pre-commit guard</b> refuses any commit that contains them. None of them appear in this document.</p>
+</section>
+
+<!-- ================================================================ 14 PROOF -->
+<section class="chapter">
+  <span class="num">Chapter 14</span>
+  <h1>Proof that it works</h1>
+  <figure>
+    {{TESTING}}
+    <figcaption><b>Figure 11. Layers of testing</b>, from small and fast (bottom) to real-world (top).</figcaption>
+  </figure>
+  <table>
+    <tr><th style="width:34%">Check</th><th>Result</th></tr>
+    <tr><td>Unit tests (Vitest)</td><td><span class="ok">200 passed</span>: battle-engine 77, core 39, client 38, server 18 (+1 that needs a local chain and is skipped), game-data 10, shared 9, contracts 9</td></tr>
+    <tr><td>Browser end-to-end (Playwright)</td><td><span class="ok">20 passed</span>: full raid loop; wall brush; Shop placement; zoom range; build + night + report; Auto Mode; two-phone friend raid and Live Duel; profile; /dev/sim digest</td></tr>
+    <tr><td>Determinism fingerprint</td><td><span class="mono">0xc0afd3965bc7fff416f2285bea70284ee39fd4dd6a88ed8a996e8f2be1037ebe</span>, identical in Node 22, Chrome, and the Android WebView</td></tr>
+    <tr><td>Golden replays</td><td><span class="ok">3 / 3 OK</span> on all three platforms</td></tr>
+    <tr><td>Type checks</td><td><span class="ok">clean</span> in every package (<code>pnpm -r typecheck</code>)</td></tr>
+    <tr><td>Originality gate</td><td><span class="ok">passed</span> over 285 files</td></tr>
+    <tr><td>Contracts on Monad testnet</td><td><span class="ok">3 deployed</span>, source verified ("perfect" match)</td></tr>
+    <tr><td>Live run on Monad</td><td><span class="ok">22 / 22 transactions succeeded</span>: agent registration, seal, commit, seed, result, reputation, 2 badges, night orders, 3 defences, 4 autopilot actions, Auto Orders and 5 Auto Mode moves</td></tr>
+    <tr><td>verify-replay --chain</td><td><span class="ok">5 / 5 checks</span> on a live raid</td></tr>
+    <tr><td>APK on Android emulator</td><td><span class="ok">played start to finish</span>, live and offline, with no page errors</td></tr>
+    <tr><td>AI officers (live)</td><td>Answers in <b>1.8–3.2 s</b>; the built-in rules take over cleanly otherwise</td></tr>
+    <tr><td>Performance</td><td>12–24 ms per battle; 150 War Room battles in about 1.3 s</td></tr>
+  </table>
+  <div class="note green"><p><b>Is the APK playable?</b> Yes. It installs and plays the whole loop on Android: on its own (offline realm), or connected to the server, where the raids, badges and reputation become real Monad transactions.</p></div>
+</section>
+
+<!-- ================================================================ 15 NOT DONE -->
+<section class="chapter newpage">
+  <span class="num">Chapter 15</span>
+  <h1>What is not done yet</h1>
+  <p>These were skipped by choice or blocked by the environment. None of them stops the game from being played.</p>
+  <table>
+    <tr><th style="width:30%">Item</th><th>Status and what it needs</th></tr>
+    <tr><td><b>Google / email sign-in</b> (Privy)</td><td>The code is in place but no Privy app was created, so the app uses <i>Guest commander</i>. It needs a Privy app ID and secret in the settings.</td></tr>
+    <tr><td><b>Foundry <code>forge test</code></b></td><td>The installer was blocked on this PC. The same contracts are tested on an in-memory EVM instead, and the Foundry test file is ready to run.</td></tr>
+    <tr><td><b>Public server</b></td><td>The server runs on this PC. Phones reach it on the same Wi-Fi or from the emulator. Release builds need an <b>https</b> address (for example a Cloudflare tunnel) before they can play online, and agent cards need <code>PUBLIC_BASE_URL</code> set to a public host.</td></tr>
+    <tr><td><b>Hosted AI model</b></td><td>No cloud API key is set; the local Qwen3 4B is used. Add <code>LLM_BASE_URL</code> and <code>LLM_API_KEY</code> to use a hosted Qwen first.</td></tr>
+    <tr><td><b>Live-chain run of friend play</b></td><td>Auto Mode now runs on the live chain (Auto Orders and 5 moves in the 2026-11-04 live run). Friend raids and Live Duels were tested on the mock ledger, which follows the same rules. RealmDuels is deployed, verified, and its relayer role was read back on chain.</td></tr>
+    <tr><td><b>Two real phones</b></td><td>Play with Friends was tested with an emulator against a browser and with two browsers; not yet on two physical phones on one Wi-Fi.</td></tr>
+    <tr><td><b>Art packs and trailer</b></td><td>All art is made by code (2D drawings and 3D models baked on the phone). The landing page has an empty trailer slot.</td></tr>
+    <tr><td><b>Publishing the code</b></td><td>The work is saved in local git commits (one small commit per change) and hasn't been pushed anywhere.</td></tr>
+  </table>
+  <h2>Small differences from the guide</h2>
+  <ul>
+    <li>Built in a new folder, <code>realm-raiders/</code>, with an extra <code>packages/core</code> so the APK can play fully offline.</li>
+    <li>Node 22 and pnpm 10 (the guide suggested Node 24 and pnpm 12).</li>
+    <li>Starting ember is 100, all troop types are available from the start (the Muster Hall sets their level), and loot scales with destruction.</li>
+    <li>Replays carry the sealed base, and RealmLedger has an extra <code>recordDefence</code> for night raids.</li>
+    <li>The local model is <b>Qwen3 4B</b> rather than 8B, to fit the 4-second budget on a 6 GB laptop GPU.</li>
+  </ul>
+</section>
+
+<!-- ================================================================ 16 RUN + GLOSSARY -->
+<section class="chapter">
+  <span class="num">Chapter 16</span>
+  <h1>How to run it, and a glossary</h1>
+<pre><span class="c"># one-time setup</span>
+pnpm install
+<span class="c"># play in the browser, whole game on-device (mock ledger) → http://localhost:5173</span>
+pnpm dev:local
+<span class="c"># app + server (live Monad + live officers need: ollama serve)</span>
+pnpm dev
+<span class="c"># build the Android debug APK</span>
+pnpm apk
+<span class="c"># all checks</span>
+pnpm -r typecheck; pnpm -r test; pnpm e2e; pnpm check:originality
+<span class="c"># every on-chain moment, end to end, with explorer links</span>
+pnpm tsx tools/live-run.ts
+<span class="c"># rebuild this document</span>
+node docs/explainer/build.mjs</pre>
+
+  <h2>Glossary</h2>
+  <div class="cols2">
+    <div>
+      <div class="term"><b>Blockchain:</b> a shared public record that many computers keep in sync. Once something is written, it can't be quietly changed.</div>
+      <div class="term"><b>Monad testnet:</b> the practice version of the Monad blockchain. Its coins have no money value, so it's safe for testing.</div>
+      <div class="term"><b>Smart contract:</b> a small program that lives on the blockchain and follows its code exactly.</div>
+      <div class="term"><b>Transaction:</b> one action sent to the blockchain, such as "record this result".</div>
+      <div class="term"><b>Gas:</b> the small fee a transaction costs. The game's relayer pays it, not the player.</div>
+      <div class="term"><b>Relayer:</b> the server's wallet, which sends transactions for players.</div>
+      <div class="term"><b>Hash:</b> a short fingerprint of any data. Change one bit of the data and the fingerprint changes completely.</div>
+      <div class="term"><b>Seed:</b> the starting number for the game's dice. Same seed, same rolls.</div>
+      <div class="term"><b>Commit–reveal:</b> first publish the hash of a secret, then reveal the secret later. It proves you didn't change your mind.</div>
+      <div class="term"><b>Deterministic:</b> always giving the same output for the same input, on any device.</div>
+      <div class="term"><b>Replay:</b> a tiny recording of a battle's inputs (what was tapped and when), not a video.</div>
+      <div class="term"><b>Tick:</b> one step of the battle clock, 1/20 of a second.</div>
+    </div>
+    <div>
+      <div class="term"><b>ERC-8004:</b> a standard for registering AI agents on a blockchain, with an ID card and a reputation score.</div>
+      <div class="term"><b>Soulbound badge:</b> a token that can't be sold or given away; it stays with the player who earned it.</div>
+      <div class="term"><b>Merkle root:</b> one fingerprint that stands for a whole list, so any single entry can be checked later.</div>
+      <div class="term"><b>Sourcify verification:</b> proof that the published source code is exactly what runs at a contract's address.</div>
+      <div class="term"><b>Monorepo:</b> one repository holding several packages that share code.</div>
+      <div class="term"><b>API:</b> the set of web addresses the app calls to ask the server for things.</div>
+      <div class="term"><b>WebSocket:</b> an always-open connection, so the server can push updates instantly.</div>
+      <div class="term"><b>Web Worker:</b> a background thread in the app, used to run battles without freezing the screen.</div>
+      <div class="term"><b>APK:</b> the install file for an Android app.</div>
+      <div class="term"><b>Capacitor:</b> a tool that wraps a web app into a native mobile app.</div>
+      <div class="term"><b>LLM:</b> a large language model, the kind of AI that writes text. Here: Qwen3.</div>
+      <div class="term"><b>Ollama:</b> a program that runs language models on your own computer.</div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

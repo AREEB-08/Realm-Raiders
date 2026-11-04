@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "xyz.realmraiders.app",
+      "sha256_cert_fingerprints": [
+        "B2:8E:4E:98:45:1E:62:3D:ED:3F:4C:97:15:E2:5E:71:75:8D:8B:BF:4A:69:3C:65:00:77:63:50:99:F5:0D:D8",
+        "05:5A:8D:39:6E:95:27:FD:D1:EE:B6:D9:FA:14:B4:3F:E0:33:DC:32:0C:64:D9:D0:50:EC:87:03:27:99:49:9F"
+      ]
+    }
+  }
+]

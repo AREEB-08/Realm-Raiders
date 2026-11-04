@@ -1,0 +1,12 @@
+{
+  "10143": {
+    "chainId": 10143,
+    "RealmLedger": "0xec0e5ae643491f288f0332f695dc2f20fdbd0352",
+    "ClanSiege": "0x69c62a2ea55724e9b70036ed7c288012a23330b1",
+    "RealmBadges": "0xfe87d11da421427f0a72f587efc7dcc13f0d4d70",
+    "RealmAgentRegistry": null,
+    "RealmDuels": "0x069d80675b73da9971620ac06c146e87262af3ca",
+    "relayer": "0x0F6d70f0F779e7d680C4126D94E345eF7B226337",
+    "deployedAt": "2026-11-03T09:44:48.487Z"
+  }
+}

@@ -1,0 +1,72 @@
+# ---------- dependencies ----------
+node_modules/
+.pnpm-store/
+
+# ---------- secrets & credentials (never commit) ----------
+.env
+.env.*
+!.env.example
+apps/*/.env
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.pem
+*.key
+keystore.properties
+apps/client/android/keystore.properties
+.secrets/
+*.secret
+
+# ---------- build output ----------
+dist/
+apps/client/android/build/
+apps/client/android/app/build/
+apps/client/android/app/release/
+apps/client/android/.gradle/
+apps/client/android/local.properties
+apps/client/android/app/src/main/assets/public/
+apps/client/android/.idea/
+apps/landing/public/realm-raiders.apk
+*.apk
+*.aab
+contracts/out/
+contracts/cache/
+contracts/artifacts/
+contracts/lib/
+contracts/broadcast/*/dev/
+*.tsbuildinfo
+
+# ---------- local data ----------
+apps/server/data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# ---------- test output ----------
+coverage/
+test-results/
+apps/client/test-results/
+playwright-report/
+
+# ---------- caches & temp ----------
+.tmp/
+.cache/
+.vite/
+.turbo/
+.eslintcache
+*.log
+_import/
+assets/raw/
+
+# ---------- OS / editor ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+*.swp
+*~
+.claude/settings.local.json
