@@ -7,6 +7,7 @@ import {
   useSignTypedData,
   useWallets,
 } from '@privy-io/react-auth';
+import { Capacitor } from '@capacitor/core';
 import { useMemo, type ReactNode } from 'react';
 import { defineChain } from 'viem';
 import { MONAD_TESTNET } from '@realm/shared';
@@ -68,7 +69,9 @@ export default function PrivyRoot({ children }: { children: ReactNode }) {
           embeddedWallets: { ethereum: { createOnLogin: 'users-without-wallets' }, showWalletUIs: false },
           defaultChain: monad,
           supportedChains: [monad],
-          customOAuthRedirectUrl: `https://${config.landingHost}/redirect`,
+          // In the APK, Google returns through the landing page's verified App Link (AppUrlListener).
+          // In a browser, Privy's default (back to this page) is used instead.
+          ...(Capacitor.isNativePlatform() ? { customOAuthRedirectUrl: `https://${config.landingHost}/redirect` } : {}),
         }}
       >
         <Bridge>{children}</Bridge>
