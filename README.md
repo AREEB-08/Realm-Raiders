@@ -25,6 +25,9 @@ Every base, battle seed and result is committed to the **Monad testnet**, so any
 
 <br/><br/>
 
+🌐 **Website:** [realm-raiders-001.vercel.app](https://realm-raiders-001.vercel.app)
+
+
 [Features](#-features) · [Screenshots](#-screenshots) · [How a raid is proven](#-how-a-raid-is-proven) · [Architecture](#%EF%B8%8F-architecture) · [Contracts](#%EF%B8%8F-smart-contracts) · [Quick start](#-quick-start) · [Testing](#-testing--verification)
 
 </div>
@@ -268,7 +271,7 @@ pnpm tsx tools/live-run.ts             # plays every on-chain moment through the
 2. **Login methods:** enable **Email** and **Google**.
 3. **Embedded wallets:** enable EVM wallets, created on login for users without a wallet.
 4. **Allowed origins:** `http://localhost:5173` (browser) and `https://localhost` (the Android WebView).
-5. **OAuth redirect URL (APK):** `https://<VITE_LANDING_HOST>/redirect` — deploy `apps/landing` there so its `/.well-known/assetlinks.json` lets Google return to the app.
+5. **OAuth redirect URL (APK):** `https://<VITE_LANDING_HOST>/redirect` — currently [`https://realm-raiders-001.vercel.app/redirect`](https://realm-raiders-001.vercel.app/redirect). The landing site (`apps/landing`, deployed on Vercel) serves `/.well-known/assetlinks.json` so Google can return to the app.
 6. Optional: **gas sponsorship** for Monad testnet. Without it, every player action falls back to the relayer automatically.
 7. Set `PRIVY_APP_ID` + `PRIVY_APP_SECRET` (server) and `VITE_PRIVY_APP_ID` (client).
 

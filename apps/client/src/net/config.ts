@@ -12,7 +12,7 @@ export const config = {
   rpcUrl: (import.meta.env.VITE_RPC_URL as string | undefined) ?? 'https://testnet-rpc.monad.xyz',
   explorerUrl: (import.meta.env.VITE_EXPLORER_URL as string | undefined) ?? 'https://testnet.monadvision.com',
   demo: (import.meta.env.VITE_DEMO ?? '1') === '1',
-  landingHost: (import.meta.env.VITE_LANDING_HOST as string | undefined) ?? 'realmraiders.pages.dev',
+  landingHost: (import.meta.env.VITE_LANDING_HOST as string | undefined) ?? 'realm-raiders-001.vercel.app',
 };
 
 export const wsUrlFor = (api: string) => config.wsUrl || api.replace(/^http/, 'ws').replace(/\/$/, '') + '/ws';

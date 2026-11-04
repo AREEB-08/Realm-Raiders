@@ -70,3 +70,4 @@ desktop.ini
 *.swp
 *~
 .claude/settings.local.json
+.vercel/
