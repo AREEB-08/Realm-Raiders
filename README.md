@@ -22,20 +22,22 @@ ollama serve     # once; model already pulled: qwen3:4b (qwen3:8b is also pulled
 Hosted Qwen (Model Studio / OpenRouter) is used first when `LLM_BASE_URL`/`LLM_API_KEY` are set. Every officer falls back to its rule-based "field manual" after 4 s, on invalid JSON, or when an answer quotes a number that is not in its facts.
 
 ### Monad testnet (live)
-Deployed and source-verified (Sourcify / MonadVision) on 2026-11-03; the server runs with `CHAIN_MODE=live`.
+Deployed and source-verified (Sourcify exact match / MonadVision) on 2026-11-04; the server runs with `CHAIN_MODE=live`.
 
 | Contract | Address |
 |---|---|
-| RealmLedger | [`0xec0e5ae643491f288f0332f695dc2f20fdbd0352`](https://testnet.monadvision.com/address/0xec0e5ae643491f288f0332f695dc2f20fdbd0352) |
-| RealmBadges | [`0xfe87d11da421427f0a72f587efc7dcc13f0d4d70`](https://testnet.monadvision.com/address/0xfe87d11da421427f0a72f587efc7dcc13f0d4d70) |
+| RealmLedger | [`0x3531C4198f0f5b97f356C4fF1f785f7A5A284c8F`](https://testnet.monadvision.com/address/0x3531C4198f0f5b97f356C4fF1f785f7A5A284c8F) |
+| RealmBadges | [`0xE94E902361906451247f0d00692d38D337068Ebb`](https://testnet.monadvision.com/address/0xE94E902361906451247f0d00692d38D337068Ebb) |
+| RealmDuels | [`0xF6F788A880F3519939e6E8864090Fe6C2CEb13Dc`](https://testnet.monadvision.com/address/0xF6F788A880F3519939e6E8864090Fe6C2CEb13Dc) |
+| ClanSiege | [`0x2dD91f2F4e5A25586f168a2422Ba1F6a66451311`](https://testnet.monadvision.com/address/0x2dD91f2F4e5A25586f168a2422Ba1F6a66451311) |
 | ERC-8004 Identity / Reputation (canonical) | `0x8004A818…BD9e` / `0x8004B663…8713` |
-| Relayer / referee | `0x0F6d70f0F779e7d680C4126D94E345eF7B226337` (key in gitignored `apps/server/.env`) |
+| Deployer / relayer / referee | `0xd32B2e51F423A1A260a00Dc52C1b3e8af97cAf27` (key in gitignored `apps/server/.env`) |
 
 ```powershell
 pnpm --filter @realm/server start        # live server on :8787 (needs `ollama serve` for live officers)
 pnpm tsx tools/live-run.ts               # plays every on-chain moment through the API and prints the explorer links
 pnpm verify-replay <battleId> --api http://localhost:8787 --chain   # re-checks a raid against RealmLedger
-pnpm --filter @realm/contracts deploy    # (re)deploy; then: pnpm --filter @realm/contracts verify
+pnpm --filter @realm/contracts run deploy   # (re)deploy all four (testnet only); then: pnpm --filter @realm/contracts run verify
 ```
 
 ### Play on a phone
