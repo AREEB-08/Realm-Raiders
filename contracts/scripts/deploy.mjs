@@ -35,7 +35,9 @@ const account = privateKeyToAccount(key);
 const relayer = process.env.RELAYER_ADDRESS || contractsEnv.RELAYER_ADDRESS || account.address;
 const badgeUri = process.env.BADGE_URI || contractsEnv.BADGE_URI || 'https://realmraiders.pages.dev/badges/{id}.json';
 
-const pub = createPublicClient({ transport: http(rpc) });
+// The public Monad RPC rate-limits bursts (HTTP 429): back off and retry (1, 2, 4 … 32 s) instead of failing mid-deploy.
+const transport = () => http(rpc, { retryCount: 6, retryDelay: 1000 });
+const pub = createPublicClient({ transport: transport() });
 const chainId = await pub.getChainId();
 // Testnet-only guard: never deploy to Monad mainnet (143) or any other chain by accident.
 const ALLOWED_CHAINS = new Set([10143, 31337]);
@@ -44,7 +46,7 @@ if (!ALLOWED_CHAINS.has(chainId)) {
   process.exit(1);
 }
 const chain = defineChain({ id: chainId, name: `chain-${chainId}`, nativeCurrency: { name: 'MON', symbol: 'MON', decimals: 18 }, rpcUrls: { default: { http: [rpc] } } });
-const wallet = createWalletClient({ account, chain, transport: http(rpc) });
+const wallet = createWalletClient({ account, chain, transport: transport() });
 const balance = await pub.getBalance({ address: account.address });
 console.log(`deployer ${account.address} on chain ${chainId}: ${formatEther(balance)} MON`);
 if (balance === 0n) {
