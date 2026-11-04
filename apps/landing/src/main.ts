@@ -146,14 +146,3 @@ function hero(canvas: HTMLCanvasElement) {
 }
 
 hero(document.getElementById('hero3d') as HTMLCanvasElement);
-
-// Show the trailer if one is deployed next to the page.
-const video = document.getElementById('trailer') as HTMLVideoElement;
-fetch('/trailer.mp4', { method: 'HEAD' })
-  .then((r) => {
-    if (r.ok && r.headers.get('content-type')?.includes('video')) {
-      video.src = '/trailer.mp4';
-      document.querySelector('.placeholder')?.remove();
-    }
-  })
-  .catch(() => {});
