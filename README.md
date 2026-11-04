@@ -17,7 +17,7 @@ Every base, battle seed and result is committed to the **Monad testnet**, so any
 
 <!-- 🎬 DEMO VIDEO: replace YOUR_VIDEO_ID in the link below with your YouTube video id
      (the part after "watch?v=" in the YouTube URL). -->
-<a href="https://www.youtube.com/watch?v=YOUR_VIDEO_ID" target="_blank" rel="noopener noreferrer" title="Watch the Realm Raiders demo on YouTube">
+<a href="https://https://www.youtube.com/watch?v=7rWs0VE33_I" target="_blank" rel="noopener noreferrer" title="Watch the Realm Raiders demo on YouTube">
   <img src="docs/media/demo-thumbnail.jpg" alt="Realm Raiders gameplay demo — click to watch on YouTube" width="860">
 </a>
 
